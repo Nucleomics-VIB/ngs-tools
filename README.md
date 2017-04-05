@@ -6,6 +6,18 @@
 
 Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/ngs-tools/wiki)** for examples and workflows.
 
+### **run_freebayes.sh**
+
+The bash file **[run_freebayes.sh](run_freebayes.sh)** calls varisant with freebayes from mappings and a reference genome.
+```bash
+# Usage: run_freebayes.sh -i <bam file> -r <fasta reference>
+# script version 1.0, 2016_09_28
+# [optional: -m <minmapq|20>]
+# [optional: -q <minbaseq|20>]
+# [optional: -F <minaltfrac|0.01>]
+# [optional: -C <minaltcnt|10>]
+```
+
 ### **makeENSref.sh**
 
 The bash file **[makeENSref.sh](makeENSref.sh)** creates a series of reference files from ENSembl FTP downloads.
