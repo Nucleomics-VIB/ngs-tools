@@ -8,7 +8,7 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/ngs-
 
 ### **makeENSref.sh**
 
-The bash file **[makeENSref.sh](/ngs-tools/makeENSref.sh)** creates a series of reference files from ENSembl FTP downloads.
+The bash file **[makeENSref.sh](makeENSref.sh)** creates a series of reference files from ENSembl FTP downloads.
 ```bash
 # Usage: makeENSref.sh
 # -o <organism (default to <homo_sapiens>)> 
