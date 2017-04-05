@@ -6,9 +6,9 @@
 
 Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/ngs-tools/wiki)** for examples and workflows.
 
-### **makeENSerf.sh**
+### **makeENSref.sh**
 
-The bash file **[makeENSerf.sh](/ngs-tools/makeENSerf.sh)** creates a series of reference files from ENSembl FTP downloads.
+The bash file **[makeENSref.sh](/ngs-tools/makeENSref.sh)** creates a series of reference files from ENSembl FTP downloads.
 ```bash
 # Usage: makeENSref.sh
 # -o <organism (default to <homo_sapiens>)> 
