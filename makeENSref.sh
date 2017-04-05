@@ -14,7 +14,7 @@
 
 version="1.0, 2017_04_05"
 
-usage='# Usage: makehumanref.sh
+usage='# Usage: makeENSref.sh
 # -o <organism (default to <homo_sapiens>)> 
 # -b <build number (default to <GRCh38>)> 
 # -r <release number (default to 88)>
