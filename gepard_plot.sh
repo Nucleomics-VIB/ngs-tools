@@ -16,10 +16,9 @@ usage='# Usage: gepard_plot.sh -x <reference assembly> -y <draft assembly> -p <p
 # [optional: -o <result folder>]
 # [optional: -w <word size:10>]
 # [optional: -W <window size:0>]
-# [optional: -h <this help text>]
-# [optional: -H <show all gepard parameters>]'
+# [optional: -h <this help text>]'
 
-while getopts "x:y:w:W:o:p:hH" opt; do
+while getopts "x:y:w:W:o:p:h" opt; do
   case $opt in
     x) reference=${OPTARG} ;;
     y) draftassembly=${OPTARG} ;;
@@ -28,7 +27,6 @@ while getopts "x:y:w:W:o:p:hH" opt; do
     o) outfile=${OPTARG} ;;
     p) gepardpath=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
-    H) showhelp=1 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
     *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
   esac
@@ -74,12 +72,6 @@ if [ ! -f "${gepardpath}/gepard.jar" ]; then
     exit 1
 fi
 
-# show full command help
-if [ -z "${showhelp}" ]; then
-	java -cp ${gepardpath}/gepard.jar org.gepard.client.cmdline.CommandLine
-	exit 0
-fi
-
 # required matrix file
 if [ ! -f "${gepardpath}/matrices/edna.mat" ]; then
     echo "edna.mat file not found at ${gepardpath}/matrices!";
@@ -97,8 +89,7 @@ cmd="java -cp ${gepardpath}/gepard.jar org.gepard.client.cmdline.CommandLine \
 	-word ${wordopt:-10} \
 	-window ${windowopt:-0} \
 	-format png \
-	-outfile ${destfile} \
-	$@"
+	-outfile ${destfile}"
 
 # show and execute	
 echo "# ${cmd}"
