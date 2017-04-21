@@ -1,5 +1,5 @@
 [(Nucleomics-VIB)](https://github.com/Nucleomics-VIB)
-![ngs-tools](pictures/pacbio_icon.png) - NGS-Tools
+![ngs-tools](pictures/ngstools.png) - NGS-Tools
 ==========
 
 *All tools presented below have only been tested by me and may contain bugs, please let me know if you find some. Each tool relies on dependencies normally listed at the top of the code (cpan for perl and cran for R will help you add them)*
@@ -28,6 +28,29 @@ The bash file **[makeENSref.sh](makeENSref.sh)** creates a series of reference f
 # -r <release number (default to 88)>
 # script version 1.0, 2017_04_05
 # [-h for this help]
+```
+
+### **gepard_plot.sh**
+
+The bash file **[gepard_plot.sh](gepard_plot.sh)** creates a xy-plot from two related assemblies. The Java GUI tools does the same but this script is applicable to multiple inputs in batch. The original tool can be found at **https://github.com/univieCUBE/gepard**.
+```bash
+# Usage: gepard_plot.sh -x <reference assembly> -y <draft assembly> -p <path to gepard.jar and matrices>
+# script version 1.0, 2017_04_21
+# [optional: -o <result folder>]
+# [optional: -w <word size:10>]
+# [optional: -W <window size:0>]
+# [optional: -h <this help text>]
+```
+
+### **mauve_reorder.sh**
+
+The bash file **[mauve_reorder.sh](mauve_reorder.sh)** reorders a draft-assembly based on a reference assembly at CLI. The Java GUI tools does the same but this script is applicable to multiple inputs in batch. The original tool can be found at **http://darlinglab.org/mauve/download.html**
+```bash
+# Usage: mauve_reorder.sh -i <draft assembly> -r <reference assembly> -p <mauve path>
+# script version 1.0, 2017_04_21
+# [optional: -o <result folder>]
+# [optional: -m <available RAM|1G>]
+# [optional: -h <this help text>]
 ```
 <hr>
 
