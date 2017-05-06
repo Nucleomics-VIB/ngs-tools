@@ -8,7 +8,7 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/ngs-
 
 ### **fastastats.pl**
 
-The bash file **[fastastats.pl](fastastats.pl)** compute simple length statistics on a multi-fasta file.
+The perl script **[fastastats.pl](fastastats.pl)** compute simple length statistics on a multi-fasta file.
 ```bash
 ## Usage: fastastats.pl <-i fasta-file (can be compressed)>
 # Additional optional filtering parameters are:
@@ -19,7 +19,7 @@ The bash file **[fastastats.pl](fastastats.pl)** compute simple length statistic
 
 ### **run_freebayes.sh**
 
-The bash file **[run_freebayes.sh](run_freebayes.sh)** calls variant with freebayes from mappings and a reference genome.
+The bash script **[run_freebayes.sh](run_freebayes.sh)** calls variant with freebayes from mappings and a reference genome.
 ```bash
 # Usage: run_freebayes.sh -i <bam file> -r <fasta reference>
 # script version 1.0, 2016_09_28
@@ -31,7 +31,7 @@ The bash file **[run_freebayes.sh](run_freebayes.sh)** calls variant with freeba
 
 ### **makeENSref.sh**
 
-The bash file **[makeENSref.sh](makeENSref.sh)** creates a series of reference files from ENSembl FTP downloads.
+The bash script **[makeENSref.sh](makeENSref.sh)** creates a series of reference files from ENSembl FTP downloads.
 ```bash
 # Usage: makeENSref.sh
 # -o <organism (default to <homo_sapiens>)> 
@@ -43,7 +43,7 @@ The bash file **[makeENSref.sh](makeENSref.sh)** creates a series of reference f
 
 ### **gepard_plot.sh**
 
-The bash file **[gepard_plot.sh](gepard_plot.sh)** creates a xy-plot from two related assemblies. The Java GUI tools does the same but this script is applicable to multiple inputs in batch. The original tool can be found at **https://github.com/univieCUBE/gepard**.
+The bash script **[gepard_plot.sh](gepard_plot.sh)** creates a xy-plot from two related assemblies. The Java GUI tools does the same but this script is applicable to multiple inputs in batch. The original tool can be found at **https://github.com/univieCUBE/gepard**.
 ```bash
 # Usage: gepard_plot.sh -x <reference assembly> -y <draft assembly> -p <path to gepard.jar and matrices>
 # script version 1.0, 2017_04_21
@@ -55,7 +55,7 @@ The bash file **[gepard_plot.sh](gepard_plot.sh)** creates a xy-plot from two re
 
 ### **mauve_reorder.sh**
 
-The bash file **[mauve_reorder.sh](mauve_reorder.sh)** reorders a draft-assembly based on a reference assembly at CLI. The Java GUI tools does the same but this script is applicable to multiple inputs in batch. The original tool can be found at **http://darlinglab.org/mauve/download.html**
+The bash script **[mauve_reorder.sh](mauve_reorder.sh)** reorders a draft-assembly based on a reference assembly at CLI. The Java GUI tools does the same but this script is applicable to multiple inputs in batch. The original tool can be found at **http://darlinglab.org/mauve/download.html**
 ```bash
 # Usage: mauve_reorder.sh -i <draft assembly> -r <reference assembly> -p <mauve path>
 # script version 1.0, 2017_04_21
