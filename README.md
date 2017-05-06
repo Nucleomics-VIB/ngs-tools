@@ -6,9 +6,20 @@
 
 Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/ngs-tools/wiki)** for examples and workflows.
 
+### **fastastats.pl**
+
+The bash file **[fastastats.pl](fastastats.pl)** compute simple length statistics on a multi-fasta file.
+```bash
+## Usage: fastastats.pl <-i fasta-file (can be compressed)>
+# Additional optional filtering parameters are:
+# <-m minsize in kb (0)>
+# <-x maxsize in kb (1E+6 | 1Gb)>
+# <-h to display this help>
+```
+
 ### **run_freebayes.sh**
 
-The bash file **[run_freebayes.sh](run_freebayes.sh)** calls varisant with freebayes from mappings and a reference genome.
+The bash file **[run_freebayes.sh](run_freebayes.sh)** calls variant with freebayes from mappings and a reference genome.
 ```bash
 # Usage: run_freebayes.sh -i <bam file> -r <fasta reference>
 # script version 1.0, 2016_09_28
