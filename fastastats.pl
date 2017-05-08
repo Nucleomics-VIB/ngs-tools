@@ -5,6 +5,7 @@
 # parse a multi-Fasta file and compute simple stats
 
 # Stephane Plaisance (VIB-NC+BITS) 2015/05/05; v1.0
+# added NXX/tot metrics (2017-05-08)
 # visit our Git: https://github.com/BITS-VIB
 
 use strict;
@@ -15,7 +16,7 @@ use Bio::SeqIO;
 use Statistics::Descriptive;
 use POSIX qw(strftime);
 
-my $version = 1.0;
+my $version = 1.1
 my $date = strftime "%m/%d/%Y", localtime;
 
 ############################
@@ -134,9 +135,12 @@ push( @result,
       "# molecules-length-N50 [kb]: "
         . ( sprintf( "%.3f", $n50_length_all / 1000 ) ." (".$n50_rank_all." records)" ) );
 push( @result,
+      "# N50/genome length: " . ( sprintf( "%.3f", 1000 * $n50_length_all / $lentot ) ) );
+push( @result,
       "# molecules-length-N90 [kb]: "
         . ( sprintf( "%.3f", $n90_length_all / 1000 ) ." (".$n90_rank_all.")" ) );
-        
+push( @result,
+      "# N90/genome length: " . ( sprintf( "%.3f", 1000 * $n90_length_all / $lentot ) ) );        
 push( @result,
       "\n# quantile distribution for All molecules (" . scalar(@BigArray) . ")" );
 
@@ -164,9 +168,12 @@ push( @result,
       "# molecules-length-N50 [kb]: "
         . ( sprintf( "%.3f", $n50_length_flt / 1000 ) ." (".$n50_rank_flt." records)" ) );
 push( @result,
+      "# N50/genome length: " . ( sprintf( "%.3f", 1000 * $n50_length_flt / $lenflt ) ) );
+push( @result,
       "# molecules-length-N90 [kb]: "
         . ( sprintf( "%.3f", $n90_length_flt / 1000 ) ." (".$n90_rank_flt." records)" ) );
-        
+push( @result,
+      "# N90/genome length: " . ( sprintf( "%.3f", 1000 * $n90_length_flt / $lenflt ) ) );        
 push( @result,
       "\n# quantile distribution for Filtered molecules (" . scalar(@filtered) . ")" );
 
