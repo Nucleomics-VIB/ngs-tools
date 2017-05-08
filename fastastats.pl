@@ -4,8 +4,8 @@
 # initial version: 2017-05-06
 # parse a multi-Fasta file and compute simple stats
 
-# Stephane Plaisance (VIB-NC+BITS) 2015/05/05; v1.0
-# added NXX/tot metrics (2017-05-08)
+# Stephane Plaisance (VIB-NC+BITS) 2017/05/05; v1.0
+# added NXX/tot metrics (2017/05/08)
 # visit our Git: https://github.com/BITS-VIB
 
 use strict;
