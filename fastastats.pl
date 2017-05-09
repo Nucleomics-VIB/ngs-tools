@@ -149,7 +149,8 @@ my $header = "variable\t"
           ( "min", "25%", "median", "75%", "90%", "max", "mean") );
 push( @result, $header );
 
-my $length = "length [kb]\t" . join( "\t", @sizedistall );
+my @kblengths = map {sprintf( "%.3f", $_ / 1000)} @sizedistall;
+my $length = "length [kb]\t" . join( "\t", @kblengths );
 push( @result, $length );
 
 ####################################
@@ -179,7 +180,8 @@ push( @result,
 
 push( @result, $header );
 
-my $lengthflt = "length [kb]\t" . join( "\t", @sizedistflt );
+my @kblengthsflt = map {sprintf( "%.3f", $_ / 1000)} @sizedistflt;
+my $lengthflt = "length [kb]\t" . join( "\t", @kblengthsflt );
 push( @result, $lengthflt );
 
 # print results to STDOUT and to file
