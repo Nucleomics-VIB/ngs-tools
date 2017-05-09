@@ -16,7 +16,7 @@ use Bio::SeqIO;
 use Statistics::Descriptive;
 use POSIX qw(strftime);
 
-my $version = 1.1
+my $version = 1.1;
 my $date = strftime "%m/%d/%Y", localtime;
 
 ############################
