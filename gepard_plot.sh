@@ -16,7 +16,7 @@ version="1.0, 2017_04_21"
 
 usage='# Usage: gepard_plot.sh -x <reference assembly> -y <draft assembly> -p <path to gepard.jar and matrices>
 # script version '${version}'
-# [optional: -o <result prefix>]
+# [optional: -o <result path/prefix>]
 # [optional: -w <word size:10>]
 # [optional: -W <window size:0>]
 # [optional: -J <java extra parameters (eg -Xmx1G, put between double quotes if it contains spaces)>
