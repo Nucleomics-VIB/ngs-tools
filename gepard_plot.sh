@@ -19,9 +19,10 @@ usage='# Usage: gepard_plot.sh -x <reference assembly> -y <draft assembly> -p <p
 # [optional: -o <result folder>]
 # [optional: -w <word size:10>]
 # [optional: -W <window size:0>]
+# [optional: -J <java extra parameters (eg -Xmx1G, put between double quotes if it contains spaces)>
 # [optional: -h <this help text>]'
 
-while getopts "x:y:w:W:o:p:h" opt; do
+while getopts "x:y:w:W:o:p:J:h" opt; do
   case $opt in
     x) reference=${OPTARG} ;;
     y) draftassembly=${OPTARG} ;;
@@ -29,6 +30,7 @@ while getopts "x:y:w:W:o:p:h" opt; do
     W) windowopt=${OPTARG} ;;
     o) outfile=${OPTARG} ;;
     p) gepardpath=${OPTARG} ;;
+    J) javaargs=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
     *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
@@ -85,7 +87,7 @@ fi
 destfile=${outfile:-"gepard-$(basename "${draftassembly}" | cut -d. -f1)_vs_$(basename "${reference}" | cut -d. -f1)"}_w${wordopt:-10}_W${windowopt:-0}.png
 
 # build the command
-cmd="java -cp ${gepardpath}/gepard.jar org.gepard.client.cmdline.CommandLine \
+cmd="java ${javaargs:-""} -cp ${gepardpath}/gepard.jar org.gepard.client.cmdline.CommandLine \
 	-seq1 ${reference} \
 	-seq2 ${draftassembly} \
 	-matrix ${gepardpath}/matrices/edna.mat \
