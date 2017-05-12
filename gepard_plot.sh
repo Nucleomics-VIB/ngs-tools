@@ -9,6 +9,9 @@
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
+# Post-install
+# create an alias named 'gepard.jar' (pointing to the actual jar file) next to a matrices folder containing edna.mat and other matrices 
+# refer with -p to that place
 version="1.0, 2017_04_21"
 
 usage='# Usage: gepard_plot.sh -x <reference assembly> -y <draft assembly> -p <path to gepard.jar and matrices>
@@ -79,7 +82,7 @@ if [ ! -f "${gepardpath}/matrices/edna.mat" ]; then
 fi
 
 # other parameters or defaults
-destfile=${outfile:-"gepard-$(basename "${draftassembly}" | cut -d. -f1)_vs_$(basename "${reference}" | cut -d. -f1)"}.png
+destfile=${outfile:-"gepard-$(basename "${draftassembly}" | cut -d. -f1)_vs_$(basename "${reference}" | cut -d. -f1)"}_w${wordopt:-10}_W${windowopt:-0}.png
 
 # build the command
 cmd="java -cp ${gepardpath}/gepard.jar org.gepard.client.cmdline.CommandLine \

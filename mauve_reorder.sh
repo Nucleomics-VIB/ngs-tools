@@ -22,10 +22,10 @@ usage='# Usage: mauve_reorder.sh -i <draft assembly> -r <reference assembly> -p 
 
 while getopts "i:r:o:p:m:h" opt; do
   case $opt in
-    i) draftfile=${OPTARG} ;;
+    i) draftassembly=${OPTARG} ;;
     r) reference=${OPTARG} ;;
-    o) outpath=${OPTARG} ;;
     p) mauvepath=${OPTARG} ;;
+    o) outpath=${OPTARG} ;;
     m) memory=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
@@ -77,7 +77,7 @@ fi
 $( hash samtools 2>/dev/null ) || ( echo "# samtools not found in PATH"; exit 1 )
 
 # other parameters or defaults
-destfolder=${outpath:-"mauve_ordered-${draftfile}"}
+destfolder=${outpath:-"mauve_ordered-${draftassembly}"}
 mem=${memory:-"1G"}
 
 # build the command
@@ -96,7 +96,7 @@ eval ${cmd}
 if [ $? -eq 0 ]; then
     cp ${destfolder}/$(ls ${destfolder}/ | sort -r | head -1)/${draftassembly} \
   ${destfolder}/ordered-${draftassembly} && \
-  samtools faidx ${destfolder}/ordered-${draftassembly}"
+  samtools faidx ${destfolder}/ordered-${draftassembly}
 else
     echo "Mauve ordering seems to have failed, please check the mauve-reorder_${draftassembly}-log.txt!"
 fi
