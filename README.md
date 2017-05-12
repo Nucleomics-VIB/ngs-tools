@@ -47,9 +47,10 @@ The bash script **[gepard_plot.sh](gepard_plot.sh)** creates a xy-plot from two 
 ```bash
 # Usage: gepard_plot.sh -x <reference assembly> -y <draft assembly> -p <path to gepard.jar and matrices>
 # script version 1.0, 2017_04_21
-# [optional: -o <result folder>]
+# [optional: -o <result path/prefix>]
 # [optional: -w <word size:10>]
 # [optional: -W <window size:0>]
+# [optional: -J <java extra parameters (eg -Xmx1G, put between double quotes if it contains spaces)>
 # [optional: -h <this help text>]
 ```
 
