@@ -13,8 +13,7 @@ use strict;
 use Bio::SeqIO;
 use Getopt::Std;
 
-my $usage="## Usage: 
-fastaCleanHeader.pl <-i fasta_file (required)>
+my $usage="## Usage: fastaCleanHeader.pl <-i fasta_file (required)>
 # <-o output file name (default to \"cleaned_\"<infile>; optional)>
 # <-c keep only the leftmost word (display_id field; optional)>
 # <-d delimiter (default to \'|\'; optional)>
