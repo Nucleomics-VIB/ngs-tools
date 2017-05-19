@@ -17,6 +17,19 @@ The perl script **[fastastats.pl](fastastats.pl)** compute simple length statist
 # <-h to display this help>
 ```
 
+### **fastaCleanHeaders.pl**
+
+The perl script **[fastaCleanHeaders.pl](fastaCleanHeaders.pl)** cleans complex fasta record names that may interfere with some applications.
+
+```bash
+## Usage: fastaCleanHeader.pl <-i fasta_file (required)>
+# <-o output file name (default to "cleaned_"<infile>; optional)>
+# <-c keep only the leftmost word (display_id field; optional)>
+# <-d delimiter (default to '|'; optional)>
+# <-z to compress results with bgzip>
+# <-h to display this help>
+```
+
 ### **run_freebayes.sh**
 
 The bash script **[run_freebayes.sh](run_freebayes.sh)** calls variant with freebayes from mappings and a reference genome.
