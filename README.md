@@ -64,6 +64,21 @@ The bash script **[mauve_reorder.sh](mauve_reorder.sh)** reorders a draft-assemb
 # [optional: -m <available RAM|1G>]
 # [optional: -h <this help text>]
 ```
+
+### **mappability.sh**
+
+The bash script **[mappability.sh](mappability.sh)** creates a mappability track for a given single-read length and a reference genome. Such tracks used to be present in IGV from the web server and have been removed. A mappability track allows you to identify those regions of the genome which as so ubiquitous that reads have no chance to map top them and explain why you may not observe coverage in these regions. For more info about this data type, please look at our page **http://wiki.bits.vib.be/index.php/Create_a_mappability_track**
+
+```bash
+# Usage: mappability.sh
+# -i <reference assembly fasta>)> 
+# -l <single read length for prediction (default to 100bps)>
+# -p <prefix for output data (default to input file prefix)>
+# -t <number of threads (default to 1)> 
+# script version 1.0, 2017_05_19
+# [-h for this help]
+```
+
 <hr>
 
 <h4>Please send comments and feedback to <a href="mailto:nucleomics.bioinformatics@vib.be">nucleomics.bioinformatics@vib.be</a></h4>
