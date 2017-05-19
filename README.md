@@ -17,9 +17,9 @@ The perl script **[fastastats.pl](fastastats.pl)** compute simple length statist
 # <-h to display this help>
 ```
 
-### **fastaCleanHeaders.pl**
+### **fastaCleanHeader.pl**
 
-The perl script **[fastaCleanHeaders.pl](fastaCleanHeaders.pl)** cleans complex fasta record names that may interfere with some applications.
+The perl script **[fastaCleanHeader.pl](fastaCleanHeader.pl)** cleans complex fasta record names that may interfere with some applications.
 
 ```bash
 ## Usage: fastaCleanHeader.pl <-i fasta_file (required)>
