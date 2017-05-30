@@ -138,7 +138,7 @@ push( @result,
       "# N50/genome length: " . ( sprintf( "%.3f", 1000 * $n50_length_all / $lentot ) ) );
 push( @result,
       "# molecules-length-N90 [kb]: "
-        . ( sprintf( "%.3f", $n90_length_all / 1000 ) ." (".$n90_rank_all.")" ) );
+        . ( sprintf( "%.3f", $n90_length_all / 1000 ) ." (".$n90_rank_all." records)" ) );
 push( @result,
       "# N90/genome length: " . ( sprintf( "%.3f", 1000 * $n90_length_all / $lentot ) ) );        
 push( @result,
