@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# script SamBam.view.sh
+# script sambam_view.sh
 # view [top N-lines (default to 50)] or full SAM or BAM data 
 #
 # Stephane Plaisance (VIB-NC) 2017/07/29; v1.0
 
-usage="Usage: SamBam.view.sh -i <SAM¬BAM.file>
+usage="Usage: sambam_view.sh -i <SAM¬BAM.file>
  -t <only first N lines (default to 50; 0 for full data)>
  -h <include header>
  -H <show only header>"

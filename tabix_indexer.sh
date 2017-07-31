@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# script tabix.index.sh
+# script tabix_indexer.sh
 # create tabix index from a bgzip compressed tabular file
 #
 # Stephane Plaisance (VIB-NC) 2017/07/29; v1.0
 
-usage="Usage: tabix.index.sh -i <tabular.file.gz> 
+usage="Usage: tabix_indexer.sh -i <tabular.file.gz> 
 	-b <begin-coordinate (2 for BED|GFF, 4 for SAM)>
 	-c <comment char (#)>
 	-e <end coordinate (3 for BED)>

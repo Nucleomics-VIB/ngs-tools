@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# script tabix.search.sh
+# script tabix_search.sh
 # search interval from a tabix indexed bgzip-compressed filebordercolor=0 .5 .5
 #
 # Stephane Plaisance (VIB-NC) 2017/07/29; v1.0
 
-usage="Usage: tabix.search.sh -i <tabular.file.gz> -q <query interval (chr:start-end)>"
+usage="Usage: tabix_search.sh -i <tabular.file.gz> -q <query interval (chr:start-end)>"
 
 while getopts "i:q:h" opt; do
   case $opt in
