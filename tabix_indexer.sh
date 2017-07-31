@@ -133,7 +133,7 @@ if [ -z "${preset}" ]; then
 ##################################
 
 if [[ ! ${infile} = *.gz ]]; then
-echo "The input file will first be sorted and compressed with bgzip!"
+echo "REM: The input file will first be sorted and compressed with bgzip!"
 
 # filter based on coordinate columns
 if [ -z "${seqc}" ]; then
