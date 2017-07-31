@@ -6,7 +6,7 @@
 # Stephane Plaisance (VIB-NC) 2017/07/29; v1.0
 
 read -d '' usage <<- EOF
-Usage: tabix_indexer.sh -i <tabular.file.gz> 
+Usage: tabix_indexer.sh -i <tabular.file.gz (if not compressed, a bgzip version is created)> 
 #	-b <begin-coordinate (2 for BED|GFF, 4 for SAM)>
 #	-c <comment char (#)>
 #	-e <end coordinate (3 for BED)>
