@@ -11,7 +11,7 @@ usage="Usage: tabix.index.sh -i <tabular.file.gz>
 	-e <end coordinate (3 for BED)>
 	-p <preset (gff|bed|sam|vcf; do not apply when any of [-s, -b, -e, -c and -0] is defined> 
 	-s <sequence name (1 for most file types)
-	-0 <data is zero-based>"
+	-0 <data is zero-based (1 for Yes, 0 as default)>"
 
 while getopts "i:b:c:e:p:s:h0" opt; do
   case $opt in
@@ -19,7 +19,7 @@ while getopts "i:b:c:e:p:s:h0" opt; do
       infile=${OPTARG}
       ;;
     0)
-      zerob=" -0"
+      zerob=${OPTARG}
       ;;
     b)
       beginc=" -b "${OPTARG}
