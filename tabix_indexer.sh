@@ -15,13 +15,16 @@ Usage: tabix_indexer.sh -i <tabular.file.gz (if not compressed, a bgzip version 
 #	-0 <data is zero-based (Undef=No as default)>
 EOF
 
-while getopts "i:b:c:e:p:s:h0" opt; do
+while getopts "i:s:b:e:c:p:h0" opt; do
   case $opt in
     i)
       infile=${OPTARG}
       ;;
     0)
       zerob=${OPTARG}
+      ;;
+    s)
+      seqc=" -s "${OPTARG}
       ;;
     b)
       beginc=" -b "${OPTARG}
@@ -34,9 +37,6 @@ while getopts "i:b:c:e:p:s:h0" opt; do
       ;;    
     p)
       preset=" -p "${OPTARG}
-      ;;
-    s)
-      seqc=" -s "${OPTARG}
       ;;
     h)
       echo "${usage}"
