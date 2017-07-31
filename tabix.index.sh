@@ -58,14 +58,18 @@ echo "${usage}"
 exit 1
 fi
 
-if [[ ! ${infile} = *.gz ]]; then
-echo "Error: input file should be compressed with bgzip!"
-exit 1
-fi
-
 # handle -0
 if [ -n "${zerob}" ]; then
 zerobased=" -0"
+fi
+
+##################################
+# ensure data is bgzip-compressed
+##################################
+
+if [[ ! ${infile} = *.gz ]]; then
+echo "The input file will first be compressed with bgzip!"
+bgzip -c ${infile} > ${infile}.gz && infile=${infile}".gz"
 fi
 
 ##################
