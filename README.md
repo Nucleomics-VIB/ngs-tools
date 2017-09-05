@@ -76,7 +76,7 @@ The bash script **[gepard_plot.sh](gepard_plot.sh)** creates a xy-plot from two 
 # [optional: -w <word size:10>]
 # [optional: -W <window size:0>]
 # [optional: -l <lower value% (default:0)>]
-# [optional: -u <upper value% (default:0)>]
+# [optional: -u <upper value% (default:100)>]
 # [optional: -g <greyscale start value% (default:0)>]
 # [optional: -J <java extra parameters (eg -Xmx1G, put between double quotes if it contains spaces)>
 # [optional: -h <this help text>]
