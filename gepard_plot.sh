@@ -21,7 +21,7 @@ usage='# Usage: gepard_plot.sh -x <reference assembly> -y <draft assembly> -p <p
 # [optional: -w <word size:10>]
 # [optional: -W <window size:0>]
 # [optional: -l <lower value% (default:0)>]
-# [optional: -u <upper value% (default:0)>]
+# [optional: -u <upper value% (default:100)>]
 # [optional: -g <greyscale start value% (default:0)>]
 # [optional: -J <java extra parameters (eg -Xmx1G, put between double quotes if it contains spaces)>
 # [optional: -h <this help text>]'
@@ -91,7 +91,8 @@ if [ ! -f "${gepardpath}/matrices/edna.mat" ]; then
 fi
 
 # other parameters or defaults
-destfile=${outfile:-"gepard-$(basename "${draftassembly}" | cut -d. -f1)_vs_$(basename "${reference}" | cut -d. -f1)"}_w${wordopt:-10}_W${windowopt:-0}.png
+destfile=${outfile:-"gepard-$(basename "${draftassembly}" | cut -d. -f1)_vs_$(basename "${reference}" | cut -d. -f1)"}
+optargs="w${wordopt:-10}_W${windowopt:-0}_${lowopt:-0}_${uppopt:-100}_${greyopt:-0}"
 
 # build the command
 cmd="java ${javaargs:-""} -cp ${gepardpath}/gepard.jar org.gepard.client.cmdline.CommandLine \
@@ -101,12 +102,12 @@ cmd="java ${javaargs:-""} -cp ${gepardpath}/gepard.jar org.gepard.client.cmdline
 	-word ${wordopt:-10} \
 	-window ${windowopt:-0} \
 	-lower ${lowopt:-0} \
-	-upper ${uppopt:-0} \
+	-upper ${uppopt:-100} \
 	-greyscale ${greyopt:-0} \
 	-format png \
-	-outfile ${destfile}"
+	-outfile ${destfile}_${optargs}.png"
 
-# show and execute	
+# show and execute
 echo "# ${cmd}"
 eval ${cmd}
 
