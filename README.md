@@ -30,6 +30,18 @@ The perl script **[fastaCleanHeader.pl](fastaCleanHeader.pl)** cleans complex fa
 # <-h to display this help>
 ```
 
+### **fasta2merge.pl**
+
+The perl script **[fasta2merge.pl](fasta2merge.pl)** creates a single fasta sequence from a multifasta file (required for ABACAS -r ref.fasta).
+
+```bash
+## Usage: fasta2merge.pl <-i fasta-file>
+# script version 1.0, 2017_09_05
+# Additional optional parameters are:
+# <-o prefix for output (default to merged-<inputname>.fasta)>
+# <-h to display this help>
+```
+
 ### **run_freebayes.sh**
 
 The bash script **[run_freebayes.sh](run_freebayes.sh)** calls variant with freebayes from mappings and a reference genome.
