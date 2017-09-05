@@ -13,7 +13,7 @@
 # Post-install
 # create an alias named 'gepard.jar' (pointing to the actual jar file) next to a matrices folder containing edna.mat and other matrices 
 # refer with -p to that place
-version="1.0, 2017_04_21"
+version="1.1, 2017_09_05"
 
 usage='# Usage: gepard_plot.sh -x <reference assembly> -y <draft assembly> -p <path to gepard.jar and matrices>
 # script version '${version}'
@@ -21,8 +21,8 @@ usage='# Usage: gepard_plot.sh -x <reference assembly> -y <draft assembly> -p <p
 # [optional: -w <word size:10>]
 # [optional: -W <window size:0>]
 # [optional: -l <lower value% (default:0)>]
-# [optional: -u <upper value* (default:0)>]
-# [optional: -g <upper value* (default:0)>]
+# [optional: -u <upper value% (default:0)>]
+# [optional: -g <greyscale start value% (default:0)>]
 # [optional: -J <java extra parameters (eg -Xmx1G, put between double quotes if it contains spaces)>
 # [optional: -h <this help text>]'
 

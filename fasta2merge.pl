@@ -19,8 +19,10 @@ use Getopt::Std;
 ############################
 getopts('i:o:h');
 our ( $opt_i, $opt_o, $opt_h );
+my $version="1.0, 2017_09_05";
 
 my $usage = "## Usage: fasta2merge.pl <-i fasta-file>
+# script version ".$version."
 # Additional optional parameters are:
 # <-o prefix for output (default to merged-<inputname>.fasta)>
 # <-h to display this help>";
