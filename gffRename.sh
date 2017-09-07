@@ -18,7 +18,6 @@ cat $1 | \
 gawk -v s=${2} 'BEGIN{ FS="\t";OFS="\t"}	{ 
 	if (/^#/) {print} else {
 	gsub(/ID=/, "ID="s"_", $9);
-	gsub(/ID=/, "ID="s"_", $9);
 	gsub(/Parent=/, "Parent="s"_", $9);
 	print $1,$2,$3,$4,$5,$6,$7,$8,$9 } 
 	}'
