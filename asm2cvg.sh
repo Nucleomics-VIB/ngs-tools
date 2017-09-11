@@ -18,10 +18,13 @@
 version="1.0, 2017_09_11"
 
 usage='# Usage: asm2cvg.sh -r <reads> -a <assembly>
+# -x <pacbio or ont2d (preset for long reads)>
+# -t <threads to be used for mapping>
+# -w < window width for coverage stats>
 # script version '${version}'
 # [optional: -w <window size|1000>]'
 
-while getopts "r:a:t:x:w:h" opt; do
+while getopts "r:a:x:t:w:h" opt; do
   case $opt in
     r) reads=${OPTARG} ;;
     a) assembly=${OPTARG} ;;
@@ -58,7 +61,7 @@ if [ ! -f "${assembly}" ]; then
 fi
 
 # bwa mapping preset pacbio or nanopore
-if [ "${preset}" == "pacbio" || "${preset}" == "ont2d" ] ; then
+if [ "${preset}" == "pacbio" ] || [ "${preset}" == "ont2d" ] ; then
 bwapreset="-x ${preset}"
 else
 bwapreset=""
