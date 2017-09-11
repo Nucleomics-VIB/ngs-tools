@@ -159,7 +159,7 @@ push( @result, $length );
 push( @result, "\n## Stats for filtered Molecules");
 push( @result, "#------------------------------");
 push( @result, "# minimum length [kb]: " . $minlen );
-push( @result, "# maximum length [kb]: " . $maxlen );
+push( @result, "# maximum length [kb]: " . sprintf( "%.3f", $maxlen / 1000 ) );
 push( @result, "# Molecule count: " . scalar(@filtered) );
 push( @result, "# Filtered-bases: " . $lenfltf );
 push( @result, "# N-bases: " . $nflt );
