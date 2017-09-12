@@ -86,7 +86,7 @@ cmd="java -Xmx${mem} -cp ${mauvepath}/Mauve.jar \
   -output ${destfolder} \
   -ref ${reference} \
   -draft ${draftassembly} \
-  >>mauve-reorder_${draftassembly}-log.txt 2>&1"
+  > mauve-reorder_${draftassembly}-log.txt 2>&1"
 
 # show and execute	
 echo "# ${cmd}"

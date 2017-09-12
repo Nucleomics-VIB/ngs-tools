@@ -19,15 +19,17 @@ version="1.0, 2017_09_11"
 
 usage='# Usage: asm2cvg.sh -r <reads> -a <assembly>
 # -x <pacbio or ont2d (preset for long reads)>
+# -s <small genome, use "-a is" for bwa index (default undef)>
 # -t <threads to be used for mapping>
 # -w < window width for coverage stats>
 # script version '${version}'
 # [optional: -w <window size|1000>]'
 
-while getopts "r:a:x:t:w:h" opt; do
+while getopts "r:a:x:t:w:sh" opt; do
   case $opt in
     r) reads=${OPTARG} ;;
     a) assembly=${OPTARG} ;;
+    s) small=1 ;;
     x) preset=$OPTARG ;;
     t) thread_opt=${OPTARG} ;;
     w) window_opt=${OPTARG} ;;
@@ -67,6 +69,13 @@ else
 bwapreset=""
 fi
 
+# is genome small or large?
+if [ ${small}==1 ]; then
+indexpreset="-a is"
+else
+indexpreset="-a bwtsw"
+fi
+
 # defaults
 binwidth=${window_opt:-1000}
 threads=${thread_opt:-8}
@@ -82,7 +91,7 @@ grep "^>" ${assembly} > ${assembly}.titles
 
 # create bwa index if does not exists
 if [ ! -f "${ref_index}.bwt" ]; then
-cmd="bwa index -p ${ref_index} ${ref_index}.fasta"
+cmd="bwa index ${indexpreset} -p ${ref_index} ${ref_index}.fasta"
 
 echo "# ${cmd}"
 eval ${cmd}
