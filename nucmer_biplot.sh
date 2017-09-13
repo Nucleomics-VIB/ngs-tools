@@ -79,14 +79,14 @@ cmd="nucmer --maxmatch \
 	${assembly1} ${assembly2}
 	> mummer3-log.txt 2>&1"
 
-# show and execute	
+# show and execute
 echo "# ${cmd}"
 eval ${cmd}
- 
+
 # after success create alignment file and plot
 if [ $? -eq 0 ]; then
 	cmd="(show-coords -r -c -l ${result}.delta > ${result}-all_coords.txt && \
-		mummerplot --fat --filter --png --large -p ${result} ${result}.delta) \
+		mummerplot --layout --fat --filter --png --large -p ${result} ${result}.delta) \
 		>> mummer3-log.txt 2>&1"
 	echo "# ${cmd}"
 	eval ${cmd}
