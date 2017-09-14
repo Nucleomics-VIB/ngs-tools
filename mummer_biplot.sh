@@ -86,6 +86,10 @@ $( hash ${prog} 2>/dev/null ) || ( echo "# ${prog} not found in PATH (nucmer or 
 $( hash show-coords 2>/dev/null ) || ( echo "# show-coords not found in PATH"; exit 1 )
 $( hash mummerplot 2>/dev/null ) || ( echo "# mummer-plot not found in PATH"; exit 1 )
 
+# labels from filenames
+xlabel=$(basename ${assembly1%.f*})
+ylabel=$(basename ${assembly2%.f*})
+
 # other parameters or defaults
 outpath=${outpathopt:-"mummer_results"}
 mkdir -p ${outpath}
@@ -108,8 +112,12 @@ if [ $? -eq 0 ]; then
 	cmd="(show-coords -r -c -l ${result}.delta > ${result}_all_coords.txt && \
 		show-coords -r -c -l -I ${minidentity} -L ${minalign} ${result}.delta \
 		> ${result}${coordfilter}_coords.txt && \
-		mummerplot --fat --filter --png --large -p ${result} ${result}.delta) \
+		mummerplot --fat --filter --layout --png --large -p ${result} ${result}.delta) \
 		>> mummer3-log.txt 2>&1"
+
+#		-r ${xlabel} \
+#		-q ${ylabel} \
+
 	echo "# ${cmd}"
 	eval ${cmd}
 else
