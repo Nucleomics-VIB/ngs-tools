@@ -20,14 +20,16 @@ usage='# Usage: mummer_biplot.sh -x <first assembly> -y <second assembly>
 # [optional: -t <data type (nucmer|promer; default nucmer)>]
 # [optional: -I <min-identity to include in show-coords|95>]
 # [optional: -L <min-align length to include in show-coords|100>]
+# [optional: -f <output format (png,postscript,x11)|png>]
 # [optional: -h <this help text>]'
 
-while getopts "x:y:o:c:p:t:I:L:h" opt; do
+while getopts "x:y:o:c:p:t:I:L:f:h" opt; do
   case $opt in
     x) assembly1=${OPTARG} ;;
     y) assembly2=${OPTARG} ;;
     p) mummerpath=${OPTARG} ;;
     o) outpathopt=${OPTARG} ;;
+    f) format=${OPTARG} ;;
     c) clust=${OPTARG} ;;
     t) datatype=${OPTARG} ;;
     I) minidentityopt=${OPTARG} ;;
@@ -41,6 +43,7 @@ done
 # defaults
 cluster=${clust:-100}
 coordfilter=""
+outformat=${foramt:-"png"}
 
 # filtering options for show-coords
 minidentity=${minidentityopt:-95}
@@ -112,7 +115,7 @@ if [ $? -eq 0 ]; then
 	cmd="(show-coords -r -c -l ${result}.delta > ${result}_all_coords.txt && \
 		show-coords -r -c -l -I ${minidentity} -L ${minalign} ${result}.delta \
 		> ${result}${coordfilter}_coords.txt && \
-		mummerplot --fat --filter --layout --png --large -p ${result} ${result}.delta) \
+		mummerplot --fat --filter --layout --${outformat} --large -p ${result} ${result}.delta) \
 		>> mummer3-log.txt 2>&1"
 
 #		-r ${xlabel} \
