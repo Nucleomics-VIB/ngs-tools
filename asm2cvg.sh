@@ -22,7 +22,7 @@ usage='# Usage: asm2cvg.sh -r <reads> -a <assembly>
 # -s <small genome, use "-a is" for bwa index (default undef)>
 # -t <threads to be used for mapping>
 # -w <window width for coverage stats>
-# -p <plot type [min,mean,median,max,all] (default all)]>
+# -p <plot stat [min,mean,median,max,all] (default median)]>
 # script version '${version}'
 # [optional: -w <window size|1000>]'
 
@@ -82,7 +82,7 @@ fi
 if [ -n "${plot_opt}" ]; then
 plot=${plot_opt}
 else
-plot="all"
+plot="median"
 fi
 
 # defaults
