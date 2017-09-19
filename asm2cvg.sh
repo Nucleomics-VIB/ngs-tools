@@ -15,7 +15,7 @@
 # a functional Rscript in your PATH
 # the plotting script btcvg2plots.R in your PATH
 
-version="1.0, 2017_09_11"
+version="1.1, 2017_09_19"
 
 usage='# Usage: asm2cvg.sh -r <reads> -a <assembly>
 # -x <pacbio or ont2d (preset for long reads)>
@@ -152,6 +152,7 @@ eval ${cmd}
 fi
 
 # run R plotting script for all contigs / chromosomes
+mkdir -p 
 cmd="btcvg2plots.R -b bedtools_coverage.${binwidth}bp_${assembly}-stats.txt \
 	-t ${assembly}.titles \
 	-s ${plot}"
