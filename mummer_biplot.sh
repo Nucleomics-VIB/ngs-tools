@@ -43,7 +43,7 @@ done
 # defaults
 cluster=${clust:-100}
 coordfilter=""
-outformat=${foramt:-"png"}
+outformat=${format:-"png"}
 
 # filtering options for show-coords
 minidentity=${minidentityopt:-95}
@@ -97,14 +97,14 @@ ylabel=$(basename ${assembly2%.f*})
 outpath=${outpathopt:-"mummer_results"}
 mkdir -p ${outpath}
 
-result="${outpath}/${prog}-plot-${assembly1%.f*}_vs_${assembly2%.f*}"
+result="${outpath}/${prog}-plot-${xlabel%.f*}_vs_${ylabel%.f*}"
 
 # build the command
 cmd="${prog} --maxmatch \
 	-c ${cluster} \
 	-p ${result} \
 	${assembly1} ${assembly2}
-	> mummer3-log.txt 2>&1"
+	> ${xlabel}_${ylabel}_mummer3-log.txt 2>&1"
 
 # show and execute	
 echo "# ${cmd}"
