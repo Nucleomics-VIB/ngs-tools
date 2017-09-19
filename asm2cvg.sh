@@ -142,7 +142,19 @@ echo "# ${cmd}"
 eval ${cmd}
 fi
 
-# run R plotting script
+# merge and generate stats for 'all' rows
+if [ ! -f "bedtools_coverage.${binwidth}bp_${assembly}-stats_all.txt" ]; then
+cmd="bedtools groupby \
+  -i <(grep "^all" bedtools_coverage.${binwidth}bp_${assembly}-hist.txt) \
+  -g 1,2,3 \
+  -c 5 -o min,median,mean,max \
+  > bedtools_coverage.${binwidth}bp_${assembly}-stats_all.txt"
+
+echo "# ${cmd}"
+eval ${cmd}
+fi
+
+# run R plotting script for all contigs / chromosomes
 cmd="btcvg2plots.R -b bedtools_coverage.${binwidth}bp_${assembly}-stats.txt \
 	-t ${assembly}.titles"
 	
