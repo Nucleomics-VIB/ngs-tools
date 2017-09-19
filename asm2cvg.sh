@@ -21,11 +21,12 @@ usage='# Usage: asm2cvg.sh -r <reads> -a <assembly>
 # -x <pacbio or ont2d (preset for long reads)>
 # -s <small genome, use "-a is" for bwa index (default undef)>
 # -t <threads to be used for mapping>
-# -w < window width for coverage stats>
+# -w <window width for coverage stats>
+# -p <plot type [min,mean,median,max,all] (default all)]>
 # script version '${version}'
 # [optional: -w <window size|1000>]'
 
-while getopts "r:a:x:t:w:sh" opt; do
+while getopts "r:a:x:t:w:p:sh" opt; do
   case $opt in
     r) reads=${OPTARG} ;;
     a) assembly=${OPTARG} ;;
@@ -33,6 +34,7 @@ while getopts "r:a:x:t:w:sh" opt; do
     x) preset=$OPTARG ;;
     t) thread_opt=${OPTARG} ;;
     w) window_opt=${OPTARG} ;;
+    p) plot_opt=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
     *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
@@ -74,6 +76,13 @@ if [ ${small}==1 ]; then
 indexpreset="-a is"
 else
 indexpreset="-a bwtsw"
+fi
+
+# metric(s) to plot?
+if [ -n "${plot_opt}" ]; then
+plot=${plot_opt}
+else
+plot="all"
 fi
 
 # defaults
@@ -143,20 +152,21 @@ eval ${cmd}
 fi
 
 # merge and generate stats for 'all' rows
-if [ ! -f "bedtools_coverage.${binwidth}bp_${assembly}-stats_all.txt" ]; then
-cmd="bedtools groupby \
-  -i <(grep "^all" bedtools_coverage.${binwidth}bp_${assembly}-hist.txt) \
-  -g 1,2,3 \
-  -c 5 -o min,median,mean,max \
-  > bedtools_coverage.${binwidth}bp_${assembly}-stats_all.txt"
-
-echo "# ${cmd}"
-eval ${cmd}
-fi
+# if [ ! -f "bedtools_coverage.${binwidth}bp_${assembly}-stats_all.txt" ]; then
+# cmd="bedtools groupby \
+#   -i <(grep "^all" bedtools_coverage.${binwidth}bp_${assembly}-hist.txt) \
+#   -g 1,2,3 \
+#   -c 5 -o min,median,mean,max \
+#   > bedtools_coverage.${binwidth}bp_${assembly}-stats_all.txt"
+# 
+# echo "# ${cmd}"
+# eval ${cmd}
+# fi
 
 # run R plotting script for all contigs / chromosomes
 cmd="btcvg2plots.R -b bedtools_coverage.${binwidth}bp_${assembly}-stats.txt \
-	-t ${assembly}.titles"
+	-t ${assembly}.titles \
+	-s ${plot}"
 	
 echo "# ${cmd}"
 eval ${cmd}
