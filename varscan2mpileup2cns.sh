@@ -106,7 +106,7 @@ cmd="samtools view -H ${bam} \
 		| java -Xmx${maxmem} -jar $VARSCAN/varscan.jar mpileup2cns \
 			--variants \
 			--output-vcf 1 \
-			--min-reads ${mincvg} \
+			--min-coverage ${mincvg} \
 			--min-reads2 ${minread2} \
 			--min-avg-qual ${minavgq} \
 			--min-var-freq ${minvarf} \
