@@ -20,11 +20,10 @@ version="1.1, 2017_09_19"
 usage='# Usage: asm2cvg.sh -r <reads> -a <assembly>
 # -x <pacbio or ont2d (preset for long reads)>
 # -s <small genome, use "-a is" for bwa index (default undef)>
-# -t <threads to be used for mapping>
-# -w <window width for coverage stats>
+# -t <threads to be used for mapping (default 4)>
+# -w <window width for coverage stats (default 1000)
 # -p <plot stat [min,mean,median,max,all] (default median)]>
-# script version '${version}'
-# [optional: -w <window size|1000>]'
+# script version '${version}
 
 while getopts "r:a:x:t:w:p:sh" opt; do
   case $opt in
@@ -87,16 +86,16 @@ fi
 
 # defaults
 binwidth=${window_opt:-1000}
-threads=${thread_opt:-8}
+threads=${thread_opt:-4}
 
 ref_index=${assembly%%.f*}
 
 # create genome size list from .fai indices
 samtools faidx ${assembly}
-cut -f1,2 ${assembly}.fai > ${assembly}.sizes
+cut -f1,2 ${assembly}.fai > $(basename ${assembly}).sizes
 
 # create title lists for plots from fasta headers
-grep "^>" ${assembly} > ${assembly}.titles
+grep "^>" ${assembly} > $(basename ${assembly}).titles
 
 # create bwa index if does not exists
 if [ ! -f "${ref_index}.bwt" ]; then
@@ -106,7 +105,7 @@ echo "# ${cmd}"
 eval ${cmd}
 fi
 
-ref_mappings="${reads%%.fastq*}_to_${assembly%%.f*}-alignments.bam"
+ref_mappings="$(basename ${reads%%.fastq*})_to_$(basename ${assembly%%.f*})-alignments.bam"
 
 # if not done yet, map reads to index, sort results, and index bam
 if [ ! -f "${ref_mappings}" ]; then
@@ -120,32 +119,32 @@ eval ${cmd}
 fi
 
 # create windows
-if [ ! -f "${assembly}.${binwidth}bp-bin.bed" ]; then
-cmd="bedtools makewindows -g ${assembly}.sizes -w ${binwidth} \
-	> ${assembly}.${binwidth}bp-bin.bed"
+if [ ! -f "$(basename ${assembly}).${binwidth}bp-bin.bed" ]; then
+cmd="bedtools makewindows -g $(basename ${assembly}).sizes -w ${binwidth} \
+	> $(basename ${assembly}).${binwidth}bp-bin.bed"
 
 echo "# ${cmd}"
 eval ${cmd}
 fi
 
 # bedtools genome wide coverage analysis
-if [ ! -f "bedtools_coverage.${binwidth}bp_${assembly}-hist.txt" ]; then
+if [ ! -f "bedtools_coverage.${binwidth}bp_$(basename ${assembly})-hist.txt" ]; then
 cmd="bedtools coverage -b ${ref_mappings}\
-  -a ${assembly}.${binwidth}bp-bin.bed \
+  -a $(basename ${assembly}).${binwidth}bp-bin.bed \
   -hist \
-  > bedtools_coverage.${binwidth}bp_${assembly}-hist.txt"
+  > bedtools_coverage.${binwidth}bp_$(basename ${assembly})-hist.txt"
 
 echo "# ${cmd}"
 eval ${cmd}
 fi
 
 # merge and generate stats for each bin (ignore 'all' rows)
-if [ ! -f "bedtools_coverage.${binwidth}bp_${assembly}-stats.txt" ]; then
+if [ ! -f "bedtools_coverage.${binwidth}bp_$(basename ${assembly})-stats.txt" ]; then
 cmd="bedtools groupby \
-  -i <(grep -v "^all" bedtools_coverage.${binwidth}bp_${assembly}-hist.txt) \
+  -i <(grep -v "^all" bedtools_coverage.${binwidth}bp_$(basename ${assembly})-hist.txt) \
   -g 1,2,3 \
   -c 5 -o min,median,mean,max \
-  > bedtools_coverage.${binwidth}bp_${assembly}-stats.txt"
+  > bedtools_coverage.${binwidth}bp_$(basename ${assembly})-stats.txt"
 
 echo "# ${cmd}"
 eval ${cmd}
@@ -153,8 +152,8 @@ fi
 
 # run R plotting script for all contigs / chromosomes
 mkdir -p 
-cmd="btcvg2plots.R -b bedtools_coverage.${binwidth}bp_${assembly}-stats.txt \
-	-t ${assembly}.titles \
+cmd="btcvg2plots.R -b bedtools_coverage.${binwidth}bp_$(basename ${assembly})-stats.txt \
+	-t $(basename ${assembly}).titles \
 	-s ${plot}"
 	
 echo "# ${cmd}"

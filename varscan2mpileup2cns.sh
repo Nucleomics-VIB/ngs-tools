@@ -6,7 +6,7 @@
 #
 ## Requirements:
 # reference fasta used for mapping
-# BAM file fromt the mapping
+# BAM file from the BWA mapping
 # samtools, varscan2, vcftools, sort, bgzip, tabix
 # varscan.jar should be present in a defined $VARSCAN folder path,
 # if not available, please instal these dependencies first
