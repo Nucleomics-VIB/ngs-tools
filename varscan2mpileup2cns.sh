@@ -122,7 +122,7 @@ eval ${cmd}
 concat=${outdir}/merged_results.vcf
 
 if [ $? -eq 0 ]; then
-vcf-concat <(find ${outdir} -name "*.vcf" -not -name "merged_results.vcf" -exec echo -n \'"{}"\'\  \; | tr '\n' ' ') \
+vcf-concat $(find ${outdir} -type f ! -size 0 -name "*.vcf" -not -name "merged_results.vcf" -exec echo -n \'"{}"\'\  \; | tr '\n' ' ') \
 	> ${concat}
 fi
 
