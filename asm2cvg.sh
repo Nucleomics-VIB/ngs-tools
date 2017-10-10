@@ -4,6 +4,7 @@
 # align reads to a provided fasta assembly with BWA mem
 # computer coverage in bins using bedtools
 # plot coverage for each chromosome using R
+# create mosaic using imagemagic
 #
 # Stephane Plaisance - VIB-Nucleomics Core - September-11-2017 v1.0
 #
@@ -41,6 +42,12 @@ while getopts "r:a:m:x:t:w:p:sh" opt; do
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
     *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
   esac
+done
+
+# check if executables are present
+declare -a arr=("samtools" "bwa" "bedtools" "btcvg2plots.R" "montage")
+for prog in "${arr[@]}"; do
+$( hash ${prog} 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
 done
 
 # test if minimal arguments were provided
@@ -161,3 +168,6 @@ cmd="btcvg2plots.R -b bedtools_coverage.${binwidth}bp_${assembly}-stats.txt \
 	
 echo "# ${cmd}"
 eval ${cmd}
+
+# create mosaic
+montage -mode concatenate coverage_plots-${assembly%%.*}/*.pdf cvg_mosaic-${assembly}.pdf
