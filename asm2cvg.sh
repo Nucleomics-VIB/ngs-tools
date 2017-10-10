@@ -155,7 +155,6 @@ eval ${cmd}
 fi
 
 # run R plotting script for all contigs / chromosomes
-mkdir -p 
 cmd="btcvg2plots.R -b bedtools_coverage.${binwidth}bp_${assembly}-stats.txt \
 	-t ${assembly}.titles \
 	-s ${plot}"
