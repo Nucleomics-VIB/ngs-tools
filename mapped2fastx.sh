@@ -117,7 +117,7 @@ fi
 nthr=${threads:-4}
 
 ##################################################################
-# aligning all reads to the index adn saving mapped reads to fastx
+# aligning all reads to the index and saving mapped reads to fastx
 
 outfolder="mapped2fastx"
 mkdir -p ${outfolder}
