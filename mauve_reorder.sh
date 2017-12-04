@@ -77,11 +77,10 @@ fi
 $( hash samtools 2>/dev/null ) || ( echo "# samtools not found in PATH"; exit 1 )
 
 # other parameters or defaults
-destfolder=${outpath:-"mauve_ordered-${draftassembly}"}
-mem=${memory:-"1G"}
-
-mkdir -p ${destfolder} || ( echo "# could not create destination folder"; exit 1 )
 outname=$(basename ${draftassembly})
+destfolder=${outpath:-"mauve_reordered-${outname%.*}"}
+mkdir -p ${destfolder} || ( echo "# could not create destination folder"; exit 1 )
+mem=${memory:-"1G"}
 
 # build the command
 cmd="java -Xmx${mem} -cp ${mauvepath}/Mauve.jar \
@@ -89,7 +88,7 @@ cmd="java -Xmx${mem} -cp ${mauvepath}/Mauve.jar \
   -output ${destfolder} \
   -ref ${reference} \
   -draft ${draftassembly} \
-  > mauve-reorder_${outname}-log.txt 2>&1"
+  > mauve-reorder_${outname%.*}-log.txt 2>&1"
 
 # show and execute	
 echo "# ${cmd}"
