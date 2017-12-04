@@ -80,13 +80,16 @@ $( hash samtools 2>/dev/null ) || ( echo "# samtools not found in PATH"; exit 1 
 destfolder=${outpath:-"mauve_ordered-${draftassembly}"}
 mem=${memory:-"1G"}
 
+mkdir -p ${destfolder} || ( echo "# could not create destination folder"; exit 1 )
+outname=$(basename ${draftassembly})
+
 # build the command
 cmd="java -Xmx${mem} -cp ${mauvepath}/Mauve.jar \
   org.gel.mauve.contigs.ContigOrderer \
   -output ${destfolder} \
   -ref ${reference} \
   -draft ${draftassembly} \
-  > mauve-reorder_${draftassembly}-log.txt 2>&1"
+  > mauve-reorder_${outname}-log.txt 2>&1"
 
 # show and execute	
 echo "# ${cmd}"
@@ -94,11 +97,11 @@ eval ${cmd}
  
 # after completion, copy the final ordered assembly to <destfolder> and index it
 if [ $? -eq 0 ]; then
-    cp ${destfolder}/$(ls ${destfolder}/ | sort -r | head -1)/${draftassembly} \
-  ${destfolder}/ordered-${draftassembly} && \
-  samtools faidx ${destfolder}/ordered-${draftassembly}
+    cp ${destfolder}/$(ls ${destfolder}/ | sort -r | head -1)/${outname} \
+  ${destfolder}/ordered-${outname} && \
+  samtools faidx ${destfolder}/ordered-${outname}
 else
-    echo "Mauve ordering seems to have failed, please check the mauve-reorder_${draftassembly}-log.txt!"
+    echo "Mauve ordering seems to have failed, please check the mauve-reorder_${outname}-log.txt!"
 fi
 
 endts=$(date +%s)

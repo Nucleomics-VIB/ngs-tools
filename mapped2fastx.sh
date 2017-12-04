@@ -19,11 +19,11 @@ Usage: mapped2fastx.sh
 #   -x <bwa mem read type (na, 'pacbio', 'ont2d'), opt)>
 #   -o <output format ('fasta', 'fastq') (default to 'fasta', opt)>
 #   -t <threads for processing (default to 4)>
-#   -s <keep only mapped reads (default, otherwise filter them out)>
+#   -a <keep only mapped reads (default, otherwise filter them out)>
 #   -h <show this help>
 EOF
 
-while getopts "i:r:x:o:t:sh" opt; do
+while getopts "i:r:x:o:t:ah" opt; do
   case $opt in
     i)
       reads=${OPTARG}
@@ -40,8 +40,8 @@ while getopts "i:r:x:o:t:sh" opt; do
 	t)
 	  threads=${OPTARG}
 	  ;;
-	s)
-	  keepspiked=1
+	a)
+	  keepmapped=1
 	  ;;
     h)
       echo "${usage}"
@@ -72,7 +72,11 @@ echo "${usage}"
 exit 1
 fi
 
-# define namez for bwa index
+# check if requirements are present
+$( hash samtools 2>/dev/null ) || ( echo "# samtools not found in PATH"; exit 1 )
+$( hash bwa 2>/dev/null ) || ( echo "# bwa not found in PATH"; exit 1 )
+
+# define name for bwa index
 idxname=$(basename ${reference%.*})
 
 # reads are pacbio or ONT type
@@ -97,7 +101,7 @@ fi
 outf=${outformat:-"fasta"}
 
 # filter out or keep the spiked alignments
-if [ -n "${keepspiked}" ]; then
+if [ -n "${keepmapped}" ]; then
 	samfilter="-F 4"
 	prefix="mapped"
 else
