@@ -6,6 +6,7 @@
 # run on a unix computer installed with Mauve
 # samtools installed
 # draft assembly and reference genome fasta present
+# + fasta sequence lines normalized using picard NormalizeFasta
 #
 # Stephane Plaisance (VIB-NC+BITS) 2017/04/21; v1.0
 #
@@ -96,7 +97,9 @@ eval ${cmd}
  
 # after completion, copy the final ordered assembly to <destfolder> and index it
 if [ $? -eq 0 ]; then
-    cp ${destfolder}/$(ls ${destfolder}/ | sort -r | head -1)/${outname} \
+	lastfolder=$(basename $(find ${destfolder} -type d -name "alignment*") ${destfolder}/ | sort -k 1V,1r | head -1)
+	echo "#last iteration: ${lastfolder}"
+	cp ${destfolder}/${lastfolder}/${outname} \
   ${destfolder}/ordered-${outname} && \
   samtools faidx ${destfolder}/ordered-${outname}
 else
