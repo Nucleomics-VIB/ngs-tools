@@ -13,7 +13,7 @@
 # check parameters for your system
 version="1.0, 2017_09_22"
 
-usage='# Usage: mummer_biplot.sh -x <first assembly> -y <second assembly>
+usage='# Usage: mummer_biplot.sh -x <reference assembly> -y <query assembly>
 # script version '${version}'
 # [optional: -o <result folder>]
 # [optional: -c <min-cluster|100>]
