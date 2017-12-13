@@ -97,7 +97,7 @@ eval ${cmd}
  
 # after completion, copy the final ordered assembly to <destfolder> and index it
 if [ $? -eq 0 ]; then
-	lastfolder=$(basename $(find ${destfolder} -type d -name "alignment*") ${destfolder}/ | sort -k 1V,1r | head -1)
+	lastfolder=$(basename $(find "${destfolder}" -type d -name "alignment*" | sort -k 1V,1r | head -1))
 	echo "#last iteration: ${lastfolder}"
 	cp ${destfolder}/${lastfolder}/${outname} \
   ${destfolder}/ordered-${outname} && \
