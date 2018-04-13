@@ -11,7 +11,7 @@
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.0, 2017_09_22"
+version="1.01, 2018_04_13"
 
 usage='# Usage: mummer_biplot.sh -x <reference assembly> -y <query assembly>
 # script version '${version}'
@@ -97,14 +97,14 @@ ylabel=$(basename ${assembly2%.f*})
 outpath=${outpathopt:-"mummer_results"}
 mkdir -p ${outpath}
 
-result="${outpath}/${prog}-plot-${xlabel%.f*}_vs_${ylabel%.f*}"
+result="${outpath}/${prog}-plot-${ylabel%.f*}_vs_${xlabel%.f*}"
 
 # build the command
 cmd="${prog} --maxmatch \
 	-c ${cluster} \
 	-p ${result} \
 	${assembly1} ${assembly2}
-	> ${xlabel}_${ylabel}_mummer3-log.txt 2>&1"
+	> ${ylabel}_vs_${xlabel}_mummer3-log.txt 2>&1"
 
 # show and execute	
 echo "# ${cmd}"
