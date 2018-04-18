@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# assemblytics.sh: produce a assembly QC based on mummer comparison to a reference
+# run_assemblytics.sh: produce a assembly QC based on mummer comparison to a reference
 #
 # Requirements:
 # run on a unix computer
@@ -17,7 +17,7 @@ version="1.0, 2017_11_27"
 # path to the Assemblytics scripts
 default_path_to_scripts="/opt/biotools/Assemblytics/"
 
-usage='# Usage: assemblytics.sh -x <reference assembly> -y <de-novo assembly>
+usage='# Usage: run_assemblytics.sh -x <reference assembly> -y <de-novo assembly>
 # script version '${version}'
 # [optional: -o <result folder|Assemblytics_results>]
 # [optional: -w <uniqseqlen|10000>]
