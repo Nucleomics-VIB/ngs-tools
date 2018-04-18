@@ -17,7 +17,7 @@ version="1.0, 2017_11_27"
 # path to the Assemblytics scripts
 default_path_to_scripts="/opt/biotools/Assemblytics/"
 
-usage='# Usage: assemblytics_biplot.sh -x <reference assembly> -y <de-novo assembly>
+usage='# Usage: assemblytics.sh -x <reference assembly> -y <de-novo assembly>
 # script version '${version}'
 # [optional: -o <result folder|Assemblytics_results>]
 # [optional: -w <uniqseqlen|10000>]
