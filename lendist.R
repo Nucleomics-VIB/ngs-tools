@@ -1,4 +1,4 @@
-#!/usr/bin/Rscript
+#!/usr/bin/env Rscript
 
 # script: lendist.R
 # Aim: plot contig cumulative length for one or several fasta assemblies
