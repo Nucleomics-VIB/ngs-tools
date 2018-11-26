@@ -96,8 +96,8 @@ if [ -n "${opt_paired}" ]; then
         out2="dedup_$(basename ${opt_paired})"
     else
         # create symlink in tmp to /dev/null
-        ln -s /dev/null /tmp/out2lnk
-        out2="/tmp/out2lnk"
+        ln -s /dev/null ./out2lnk
+        out2="./out2lnk"
     fi
     cmd="${cmd} out2=${out2}"
 fi
@@ -106,8 +106,8 @@ if [ -n "${opt_write}" ]; then
     out="dedup_$(basename ${opt_reads})"
 else
     # create symlink in tmp to /dev/null
-    ln -s /dev/null /tmp/outlnk
-    out="/tmp/outlnk"
+    ln -s /dev/null ./outlnk
+    out="./outlnk"
 fi
 
 cmd="${cmd} out=${out}"
@@ -138,27 +138,34 @@ V)
   ;;
 esac
 
-cmd="$cmd ${opts} "
+# because out /tmp partition is so small
+cmd="$cmd ${opts} tmpdir=. usetmpdir=t"
 
 #############################
 # defaults summary name
 prefix=${opt_prefix:-$(basename $opt_reads)}
 # remove extension(s)
 prefix=${prefix%.gz}
-prefix=${prefix%.fa*}_summary.txt
+prefix=${prefix%.fa*}
+# 2 output files
+log=${prefix}_clumpify-log.txt
+summary=${prefix}_summary.txt
 
-cmd="${cmd} | tee -a ${prefix}"
+# save stderr to file too
+exec 2> >(tee -a ${log})
 
 echo "# ${cmd}"
 eval ${cmd}
 
 # happy ending
 if [ $? -eq 0 ]; then
-    echo "# results saved in ${prefix}"
+    echo
+    echo "# results saved in ${summary}"
+    echo
+	(echo "# "${prefix}"; tail -6 ${log} | head -5) | tee -a ${summary}
     # cleanup links
     if [ -z "${opt_write}" ]; then
         unlink ${out}
         unlink ${out2}
     fi
 fi
-
