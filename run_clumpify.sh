@@ -162,7 +162,7 @@ if [ $? -eq 0 ]; then
     echo
     echo "# results saved in ${summary}"
     echo
-	(echo "# "${prefix}"; tail -6 ${log} | head -5) | tee -a ${summary}
+	(echo "# ${prefix}"; tail -6 ${log} | head -5) | tee -a ${summary}
     # cleanup links
     if [ -z "${opt_write}" ]; then
         unlink ${out}
