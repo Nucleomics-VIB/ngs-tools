@@ -11,6 +11,7 @@
 
 # requirements
 # BBTools clumpify.sh from https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/
+# clumpify https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/clumpify-guide/
 
 version="1.0, 2018_11_26"
 
