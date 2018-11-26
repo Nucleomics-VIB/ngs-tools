@@ -138,7 +138,7 @@ V)
   ;;
 esac
 
-cmd="$cmd ${opts}"
+cmd="$cmd ${opts} "
 
 #############################
 # defaults summary name
@@ -147,7 +147,7 @@ prefix=${opt_prefix:-$(basename $opt_reads)}
 prefix=${prefix%.gz}
 prefix=${prefix%.fa*}_summary.txt
 
-cmd="$cmd | tee -a ${prefix}"
+cmd="${cmd} | tee -a ${prefix}"
 
 echo "# ${cmd}"
 eval ${cmd}
