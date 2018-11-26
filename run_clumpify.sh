@@ -150,10 +150,15 @@ prefix=${prefix%.fa*}_summary.txt
 cmd="$cmd | tee -a ${prefix}"
 
 echo "# ${cmd}"
-eval ${cmd} && echo "# results saved in ${prefix}"
+eval ${cmd}
 
-# cleanup links
-if [ -z "${opt_write}" ]; then
-    unlink ${out}
-    unlink ${out2}
+# happy ending
+if [ $? -eq 0 ]; then
+    echo "# results saved in ${prefix}"
+    # cleanup links
+    if [ -z "${opt_write}" ]; then
+        unlink ${out}
+        unlink ${out2}
+    fi
 fi
+
