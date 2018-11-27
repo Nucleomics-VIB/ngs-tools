@@ -5,7 +5,7 @@
 # find optical read duplicates and return counts
 # opt: remove duplicates and create output read files
 #
-# Stephane Plaisance - VIB-Nucleomics Core - September-11-2017 v1.0
+# Stephane Plaisance - VIB-Nucleomics Core - November-26-2018 v1.0
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
@@ -13,7 +13,7 @@
 # BBTools clumpify.sh from https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/
 # clumpify https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/clumpify-guide/
 
-version="1.0, 2018_11_26"
+version="1.0.1, 2018_11_27"
 
 # <dedup distance
 #     NextSeq      40  (and spany=t)
@@ -32,15 +32,17 @@ usage='# Usage: run_clumpify.sh
 # -p <opt: paired-reads (fastq or gz archive)>
 # -o <opt: <prefix>_summary.txt (default to basename of <reads>)>
 # -T <one out of N|H|V (N=NextSeq, H=HiSeq3/4k, V=NovaSeq)>
+# -t <threads (all if not used)>
 # -w <opt: write deduplicated read set(s) (default to /dev/null)>
 # -h <this help text>
 # script version '${version}
 
-while getopts "r:p:o:T:wh" opt; do
+while getopts "r:p:o:t:T:wh" opt; do
   case $opt in
     r) opt_reads=${OPTARG} ;;
     p) opt_paired=${OPTARG} ;;
     o) opt_prefix=${OPTARG} ;;
+    t) opt_threads=${OPTARG} ;;
     T) opt_type=${OPTARG} ;;
     w) opt_write=1 ;;
     t) opt_tmp=${OPTARG} ;;
@@ -83,11 +85,19 @@ fi
 
 ##############################
 # paired read command
+if [ -n "${opt_threads}" ]; then
+   cmd="${clumpify} t=${opt_threads}"
+else
+   cmd="${clumpify}"
+fi
+
+##############################
+# paired read command
 if [ -n "${opt_paired}" ]; then
-   cmd="${clumpify} in=${opt_reads} in2=${opt_paired}"
+   cmd="${cmd} in=${opt_reads} in2=${opt_paired}"
 else
    # single read command
-   cmd="${clumpify} in=${opt_reads}"
+   cmd="${cmd} in=${opt_reads}"
 fi
 
 #############################
