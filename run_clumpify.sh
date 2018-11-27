@@ -173,7 +173,13 @@ if [ $? -eq 0 ]; then
     echo
     echo "# results saved in ${summary}"
     echo
+	if [ -n "${opt_paired}" ]; then
+	input=$(basename $opt_reads)"_"$(basename $opt_reads2)
 	(echo "# ${prefix}"; tail -6 ${log} | head -5) | tee -a ${summary}
+    else
+    input=$(basename $opt_reads)
+    fi
+	(echo "# ${input}"; tail -6 ${log} | head -5) | tee -a ${summary}
 
     # cleanup symlinks
     if [ -L "${out}" ]; then
