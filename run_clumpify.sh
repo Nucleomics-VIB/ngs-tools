@@ -174,9 +174,13 @@ if [ $? -eq 0 ]; then
     echo "# results saved in ${summary}"
     echo
 	(echo "# ${prefix}"; tail -6 ${log} | head -5) | tee -a ${summary}
-    # cleanup links
-    if [ -z "${opt_write}" ]; then
+
+    # cleanup symlinks
+    if [ -L "${out}" ]; then
         unlink ${out}
+    fi
+    
+    if [ -n "${out2}" ]; then
         unlink ${out2}
     fi
 fi
