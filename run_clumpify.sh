@@ -54,7 +54,7 @@ done
 
 #############################
 # check executables present
-declare -a arr=( "clumpify.sh" )
+declare -a arr=( "clumpify.sh" "grep" "tee" )
 for prog in "${arr[@]}"; do
 $( hash ${prog} 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
 done
@@ -163,7 +163,7 @@ log=${prefix}_clumpify-log.txt
 summary=${prefix}_summary.txt
 
 # save stderr to file too
-exec 2> >(tee -a ${log})
+exec 2> >(tee ${log})
 
 echo "# ${cmd}"
 eval ${cmd}
@@ -174,19 +174,19 @@ if [ $? -eq 0 ]; then
     echo "# results saved in ${summary}"
     echo
 	if [ -n "${opt_paired}" ]; then
-	input=$(basename ${opt_reads})"_"$(basename ${opt_paired})
-	(echo "# ${prefix}"; tail -6 ${log} | head -5) | tee -a ${summary}
+	input=$(basename ${opt_reads})" & "$(basename ${opt_paired})
+	(echo "# ${prefix}"; grep "Reads In:" -A 4 ${log}) | tee ${summary}
     else
     input=$(basename ${opt_reads})
     fi
-	(echo "# ${input}"; tail -6 ${log} | head -5) | tee -a ${summary}
+	(echo "# ${input}"; grep "Reads In:" -A 4 ${log}) | tee ${summary}
 
     # cleanup symlinks
     if [ -L "${out}" ]; then
         unlink ${out}
     fi
     
-    if [ -n "${out2}" ]; then
+    if [ -L "${out2}" ]; then
         unlink ${out2}
     fi
 fi
