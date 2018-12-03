@@ -85,20 +85,21 @@ fi
 
 # create new folder
 basedir=$(dirname ${infile})
+refname=$(basename ${infile%.fa*})
 outdir="${basedir}/${pref}-mappability"
 mkdir -p ${outdir}
 
 # clean reference fasta file (names with space or comments)
 echo "# creating a clean reference and size list"
-bioawk -c fastx '{printf(">%s\n%s",$name,$seq)}' ${infile} \
-	> ${outdir}/${infile}
+bioawk -c fastx '{printf(">%s\n%s\n",$name,$seq)}' ${infile} \
+	> ${outdir}/${refname}.fa
 
 bioawk -c fastx '{ printf("%s\t%s\n",$name,length($seq)) }' ${infile} \
-	> ${outdir}/${pref}.sizes
+	> ${outdir}/${refname}.sizes
 
 # create index
 echo "# creating GEM index ... be patient"
-gem-indexer -i ${outdir}/${infile} \
+gem-indexer -i ${outdir}/${refname}.fa \
 	-o ${outdir}/${idxpref} \
 	--complement ${comp} \
 	-c 'dna' \
@@ -120,7 +121,7 @@ gem-2-wig -I ${outdir}/${idxpref}.gem \
 # convert to BigWig
 echo "# converting to BigWIG"
 wigToBigWig ${outdir}/${pref}_${kmer}.wig \
-	${outdir}/${pref}.sizes \
+	${outdir}/${refname}.sizes \
 	${outdir}/${pref}_${kmer}.bw
 
 echo "# all done."
