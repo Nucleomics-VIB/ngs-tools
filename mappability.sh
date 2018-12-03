@@ -5,11 +5,10 @@
 # convert to bigwig format for IGV
 #
 ## Requirements:
-# Fasta sequence names should not contain spaces !!!
 # A strong unix computer (more threads=>shorter execution time)
 # Jim Kent's Utils (https://github.com/ENCODE-DCC/kentUtils)
 # GEM (http://algorithms.cnag.cat/wiki/GEM:Installation_instructions)
-# samtools for indexing
+# samtools for indexing and extracting reference sizes
 # picard tools for producing the dict file
 # a recent bash for capitalisation
 #
@@ -18,7 +17,7 @@
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
-version="1.1, 2018_11_30"
+version="1.1, 2018_12_03"
 
 usage='# Usage: mappability.sh
 # -i <reference assembly fasta (not gzipped!)>)> 
@@ -44,7 +43,7 @@ done
 
 #############################
 # check executables present
-declare -a arr=( "faSize" "gem-indexer" "gem-mappability" "gem-2-wig" "wigToBigWig" )
+declare -a arr=( "samtools" "gem-indexer" "gem-mappability" "gem-2-wig" "wigToBigWig" )
 for prog in "${arr[@]}"; do
 $( hash ${prog} 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
 done
@@ -91,8 +90,12 @@ outdir="${basedir}/${pref}-mappability"
 mkdir -p ${outdir}
 
 # create reference size list
+# faSize ${infile} -detailed > ${outdir}/${pref}.sizes
+# faSize does not handle correctly long sequence names with spaces
+# replaced by samtools and cut
 echo "# creating reference size list"
-faSize ${infile} -detailed > ${outdir}/${pref}.sizes
+samtools faidx ${infile} \
+&& cut -f 1,2 ${infile}.fai > ${outdir}/${pref}.sizes
 
 # create index
 echo "# creating GEM index ... be patient"
