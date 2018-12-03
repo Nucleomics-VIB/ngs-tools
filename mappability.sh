@@ -43,7 +43,7 @@ done
 
 #############################
 # check executables present
-declare -a arr=( "samtools" "gem-indexer" "gem-mappability" "gem-2-wig" "wigToBigWig" )
+declare -a arr=( "bioawk" "samtools" "gem-indexer" "gem-mappability" "gem-2-wig" "wigToBigWig" )
 for prog in "${arr[@]}"; do
 $( hash ${prog} 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
 done
@@ -89,18 +89,22 @@ basedir=$(dirname ${infile})
 outdir="${basedir}/${pref}-mappability"
 mkdir -p ${outdir}
 
+# clean reference fasta file (names with space or comments)
+bioawk -c fastx '{print ">"$name; print $seq}' ${infile} \
+	> ${outdir}/${infile}
+
 # create reference size list
 # faSize ${infile} -detailed > ${outdir}/${pref}.sizes
 # faSize does not handle correctly long sequence names with spaces
 # replaced by samtools and cut v1.2
 echo "# creating reference size list"
-samtools faidx ${infile} \
-	&& cut -f 1,2 ${infile}.fai \
+samtools faidx ${outdir}/${infile} \
+	&& cut -f 1,2 ${outdir}/${infile}.fai \
 	> ${outdir}/${pref}.sizes
 
 # create index
 echo "# creating GEM index ... be patient"
-gem-indexer -i ${infile} \
+gem-indexer -i ${outdir}/${infile} \
 	-o ${outdir}/${idxpref} \
 	--complement ${comp} \
 	-c 'dna' \
