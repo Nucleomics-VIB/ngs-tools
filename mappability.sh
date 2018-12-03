@@ -17,7 +17,7 @@
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
-version="1.1, 2018_12_03"
+version="1.2, 2018_12_03"
 
 usage='# Usage: mappability.sh
 # -i <reference assembly fasta (not gzipped!)>)> 
@@ -92,10 +92,11 @@ mkdir -p ${outdir}
 # create reference size list
 # faSize ${infile} -detailed > ${outdir}/${pref}.sizes
 # faSize does not handle correctly long sequence names with spaces
-# replaced by samtools and cut
+# replaced by samtools and cut v1.2
 echo "# creating reference size list"
 samtools faidx ${infile} \
-&& cut -f 1,2 ${infile}.fai > ${outdir}/${pref}.sizes
+	&& cut -f 1,2 ${infile}.fai \
+	> ${outdir}/${pref}.sizes
 
 # create index
 echo "# creating GEM index ... be patient"
