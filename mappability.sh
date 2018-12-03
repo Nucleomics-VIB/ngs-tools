@@ -8,8 +8,7 @@
 # A strong unix computer (more threads=>shorter execution time)
 # Jim Kent's Utils (https://github.com/ENCODE-DCC/kentUtils)
 # GEM (http://algorithms.cnag.cat/wiki/GEM:Installation_instructions)
-# samtools for indexing and extracting reference sizes
-# picard tools for producing the dict file
+# bioawk for reference cleaning (https://github.com/lh3/bioawk)
 # a recent bash for capitalisation
 #
 # Stephane Plaisance (VIB-NC+BITS) 2017/05/19; v1.0
@@ -43,7 +42,7 @@ done
 
 #############################
 # check executables present
-declare -a arr=( "bioawk" "samtools" "gem-indexer" "gem-mappability" "gem-2-wig" "wigToBigWig" )
+declare -a arr=( "bioawk" "gem-indexer" "gem-mappability" "gem-2-wig" "wigToBigWig" )
 for prog in "${arr[@]}"; do
 $( hash ${prog} 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
 done
@@ -90,16 +89,11 @@ outdir="${basedir}/${pref}-mappability"
 mkdir -p ${outdir}
 
 # clean reference fasta file (names with space or comments)
-bioawk -c fastx '{print ">"$name; print $seq}' ${infile} \
+echo "# creating a clean reference and size list"
+bioawk -c fastx '{printf(">%s\n%s",$name,$seq)}' ${infile} \
 	> ${outdir}/${infile}
 
-# create reference size list
-# faSize ${infile} -detailed > ${outdir}/${pref}.sizes
-# faSize does not handle correctly long sequence names with spaces
-# replaced by samtools and cut v1.2
-echo "# creating reference size list"
-samtools faidx ${outdir}/${infile} \
-	&& cut -f 1,2 ${outdir}/${infile}.fai \
+bioawk -c fastx '{ printf("%s\t%s\n",$name,length($seq)) }' ${infile} \
 	> ${outdir}/${pref}.sizes
 
 # create index
