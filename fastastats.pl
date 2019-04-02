@@ -1,4 +1,4 @@
-#!/usr/bin/env perl -w
+#!/usr/bin/perl -w
 
 # fastastats.pl
 # initial version: 2017-05-06
@@ -193,23 +193,24 @@ close OUT;
 exit 0;
 
 ##################
+
 sub OpenArchiveFile {
     my $infile = shift;
     my $FH;
-    if ($infile =~ /.fa$|.fasta$|.fna$/) {
+    if ($infile =~ /.fa$|.fasta$|.fna$/i) {
     $FH = Bio::SeqIO -> new(-file => "$infile", -format => 'Fasta');
     }
-    elsif ($infile =~ /.gz$/) {
-    $FH = Bio::SeqIO -> new(-file => "bgzip -cd $infile| ", -format => 'Fasta');
+    elsif ($infile =~ /.fa.bz2$|.fasta.bz2$|.fna.bz2$/i) {
+    $FH = Bio::SeqIO -> new(-file => "bgzip -c $infile | ", -format => 'Fasta');
     }
-    elsif ($infile =~ /.bz2$/) {
-    $FH = Bio::SeqIO -> new(-file => "bzip2 -c $infile| ", -format => 'Fasta');
+    elsif ($infile =~ /.fa.gz$|.fasta.gz|.fna.gz/i) {
+    $FH = Bio::SeqIO -> new(-file => "gzip -cd $infile |", -format => 'Fasta');
     }
-    elsif ($infile =~ /.zip$/) {
-    $FH = Bio::SeqIO -> new(-file => "unzip -p $infile| ", -format => 'Fasta');
+    elsif ($infile =~ /.fa.zip$|.fasta.zip$|.fna.zip$/i) {
+    $FH = Bio::SeqIO -> new(-file => "unzip -p $infile | ", -format => 'Fasta');
     } else {
 	die ("$!: do not recognise file type $infile");
-	# if this happens, add the file type with correct opening proc
+	# if this happens add, the file type with correct opening proc
     }
     return $FH;
 }
