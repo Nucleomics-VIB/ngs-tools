@@ -198,16 +198,16 @@ sub OpenArchiveFile {
     my $infile = shift;
     my $FH;
     if ($infile =~ /.fa$|.fasta$|.fna$/i) {
-    $FH = Bio::SeqIO -> new(-file => "$infile", -format => 'Fasta');
+    $FH = Bio::SeqIO -> new( -file => "$infile", -format => 'Fasta' );
     }
     elsif ($infile =~ /.fa.bz2$|.fasta.bz2$|.fna.bz2$/i) {
-    $FH = Bio::SeqIO -> new(-file => "bgzip -c $infile | ", -format => 'Fasta');
+    $FH = Bio::SeqIO -> new( -file => "bgzip -c $infile |", -format => 'Fasta' );
     }
     elsif ($infile =~ /.fa.gz$|.fasta.gz|.fna.gz/i) {
-    $FH = Bio::SeqIO -> new(-file => "gzip -cd $infile |", -format => 'Fasta');
+    $FH = Bio::SeqIO -> new( -file => "gzip -cd $infile |", -format => 'Fasta' );
     }
     elsif ($infile =~ /.fa.zip$|.fasta.zip$|.fna.zip$/i) {
-    $FH = Bio::SeqIO -> new(-file => "unzip -p $infile | ", -format => 'Fasta');
+    $FH = Bio::SeqIO -> new( -file => "unzip -p $infile | ", -format => 'Fasta' );
     } else {
 	die ("$!: do not recognise file type $infile");
 	# if this happens add, the file type with correct opening proc
