@@ -14,8 +14,9 @@ winfile=${genome}_${width}k_windows.bed
 bedtools makewindows -w ${width}000 -g ${genome} > ${winfile}
 
 # intersect data and windows
-bedtools intersect -a ${winfile} -b ${input} -wa -wb > ${input%.bed}_${width}k_windows.txt && \
-  rm ${winfile}
+bedtools intersect -a ${winfile} -b ${input} -wa -wb > ${input%.bed}_${width}k_windows.txt
+# && \
+#  rm ${winfile}
 
 # create density track
 lastcol=7
@@ -24,5 +25,6 @@ echo "#track name=${input%.bed}_${width}k_density autoScale=on graphType=bar col
   > ${input%.bed}_${width}k_density.igv
 bedtools groupby -i ${input%.bed}_${width}k_windows.txt -g 1,2,3 -c ${lastcol} -o ${stat} | \
   awk -v featname=${featname} 'BEGIN{FS="\t"; OFS="\t"}{print $1,$2,$3,featname,$4}' \
-    >> ${input%.bed}_${width}k_density.igv && \
-    rm ${input%.bed}_${width}k_windows.txt
+    >> ${input%.bed}_${width}k_density.igv
+#     && \
+#    rm ${input%.bed}_${width}k_windows.txt
