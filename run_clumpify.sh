@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # usage: run_clumpify.sh -r <reads> -p <paired_reads>
 # 
 # find optical read duplicates and return counts
