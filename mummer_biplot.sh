@@ -21,9 +21,10 @@ usage='# Usage: mummer_biplot.sh -x <reference assembly> -y <query assembly>
 # [optional: -I <min-identity to include in show-coords|95>]
 # [optional: -L <min-align length to include in show-coords|100>]
 # [optional: -f <output format (png,postscript,x11)|png>]
+# [optional: -T <threads for nucmer job>|1]
 # [optional: -h <this help text>]'
 
-while getopts "x:y:o:c:p:t:I:L:f:h" opt; do
+while getopts "x:y:o:c:p:t:I:L:f:T:h" opt; do
 	case $opt in
 		x) assembly1=${OPTARG} ;;
 		y) assembly2=${OPTARG} ;;
@@ -34,6 +35,7 @@ while getopts "x:y:o:c:p:t:I:L:f:h" opt; do
 		t) datatype=${OPTARG} ;;
 		I) minidentityopt=${OPTARG} ;;
 		L) minalignopt=${OPTARG} ;;
+		T) threads=${OPTARG} ;;
 		h) echo "${usage}" >&2; exit 0 ;;
 		\?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
 		*) echo "this command requires arguments, try -h" >&2; exit 1 ;;
@@ -41,6 +43,7 @@ while getopts "x:y:o:c:p:t:I:L:f:h" opt; do
 done
 
 # defaults
+thr=${threads:-1}
 cluster=${clust:-100}
 coordfilter=""
 outformat=${format:-"png"}
@@ -99,12 +102,21 @@ mkdir -p ${outpath}
 
 result="${outpath}/${prog}-plot-${ylabel%.f*}_vs_${xlabel%.f*}"
 
+# threads for nucmer only
+multi=""
+if [ -n "${threads}" ]; then
+	multi="-t ${threads}"
+fi
+
 # build the command
+stamp=$(date +%s)
+
 cmd="${prog} --maxmatch \
 	-c ${cluster} \
 	-p ${result} \
+	${multi} \
 	${assembly1} ${assembly2}
-	> ${ylabel}_vs_${xlabel}_mummer3-log.txt 2>&1"
+	> ${ylabel}_vs_${xlabel}_mummer3-log_${stamp}.txt 2>&1"
 
 # show and execute	
 echo "# ${cmd}"
@@ -116,12 +128,12 @@ if [ $? -eq 0 ]; then
 		show-coords -r -c -l -I ${minidentity} -L ${minalign} ${result}.delta \
 		> ${result}${coordfilter}_coords.txt && \
 		mummerplot --fat --filter --layout --${outformat} --large -p ${result} ${result}.delta) \
-		>> ${ylabel}_vs_${xlabel}_mummer3-log.txt 2>&1"
+		>> ${ylabel}_vs_${xlabel}_mummer3-log_${stamp}.txt 2>&1"
 
 	echo "# ${cmd}"
 	eval ${cmd}
 else
-	echo "Mummer analysis seems to have failed, please check ${ylabel}_vs_${xlabel}_mummer3-log.txt!"
+	echo "Mummer analysis seems to have failed, please check ${ylabel}_vs_${xlabel}_mummer3-log_${stamp}.txt!"
 fi
 
 exit 0

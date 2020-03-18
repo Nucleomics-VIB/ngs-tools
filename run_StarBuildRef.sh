@@ -7,21 +7,26 @@
 # Stéphane Plaisance - VIB-BITS - Mar-22-2012 v1
 # small edits, 2016-03-13 v1.1
 # small edits, 2019-06-25 v1.2
+# small edits, 2020-02-28 v1.3
 
-version="1.2, 2019_06_25"
+version="1.3, 2020_02_28"
 
 usage='# Usage: StarBuildRef.sh
 # -i <reference.fasta>
 # -g <matching gtf file>
 # -l <read length (default: 75)>
-# -o <STAR-indices root (if $STAR_INDEXES is not defined)>
+# -o <STAR-indices root folder (if $STAR_INDEXES is not defined)>
+# -t <title for this new STAR-indices folder (or defined from inputs)
 # -h <this help text>
 # script version '${version}
 
-while getopts "o:i:g:l:h" opt; do
+while getopts "o:i:g:l:t:h" opt; do
   case $opt in
     o)
       outdir=${OPTARG}
+      ;;
+    t)
+      outfolder=${OPTARG}
       ;;
     i)
       reffasta=${OPTARG}
@@ -102,26 +107,27 @@ if ! [[ ${idxlen} =~ $re ]] ; then
 fi
 
 # create folder for star files
-destfolder=${refpref}-index_${readlen}
+destfolder=${outfolder:-"${refpref}-index_${readlen}"}
 mkdir -p ${star_folder}/${destfolder}
 
 # save all to log for ezrror tracing ...
 starttime=$(date +%s)
-logfile=${star_folder}/star_${destfolder}-log.txt
+logfile=${star_folder}/${destfolder}/starindex_build-log.txt
 exec &> >(tee -a "${logfile}")
 
 # build STAR index
 cmd="STAR \
-	--outFileNamePrefix ${star_folder}/${destfolder} \
-	--runThreadN ${thr} \
-	--runMode genomeGenerate \
-	--genomeDir ${star_folder}/${destfolder} \
-	--genomeFastaFiles ${reffasta} \
-	--sjdbGTFfile ${refgtf} \
-	--sjdbOverhang ${idxlen}"
+    --outFileNamePrefix ${star_folder}/${destfolder} \
+    --runThreadN ${thr} \
+    --runMode genomeGenerate \
+    --genomeDir ${star_folder}/${destfolder} \
+    --genomeFastaFiles ${reffasta} \
+    --sjdbGTFfile ${refgtf} \
+    --sjdbOverhang ${idxlen}"
 
 echo "# ${cmd}"
-eval ${cmd}
+eval ${cmd} && \
+    mv ${star_folder}/${destfolder}Log.out ${star_folder}/${destfolder}/
 
 # report run duration
 endtime=$(date +%s)
