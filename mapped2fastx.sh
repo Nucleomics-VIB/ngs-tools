@@ -15,7 +15,7 @@
 read -d '' usage <<- EOF
 Usage: mapped2fastx.sh 
 #   -i <reads.fastx (required)>
-#   -r <reference (mutlifasta with target regions, required)>
+#   -r <reference (multifasta with target regions, required)>
 #   -x <bwa mem read type (na, 'pacbio', 'ont2d'), opt)>
 #   -o <output format ('fasta', 'fastq') (default to 'fasta', opt)>
 #   -t <threads for processing (default to 4)>

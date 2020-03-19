@@ -43,7 +43,6 @@ while getopts "x:y:o:c:p:t:I:L:f:T:h" opt; do
 done
 
 # defaults
-thr=${threads:-1}
 cluster=${clust:-100}
 coordfilter=""
 outformat=${format:-"png"}
@@ -60,6 +59,13 @@ if [ -z "${datatype}" ]; then
 	prog="nucmer"
 else
 	prog="${datatype}"
+fi
+
+# threads => for nucmer only
+thr=${threads:-1}
+multi=""
+if [ ${prog} = "nucmer" ]; then
+	multi="-t ${thr}"
 fi
 
 # test if minimal arguments were provided
@@ -101,12 +107,6 @@ outpath=${outpathopt:-"mummer_results"}
 mkdir -p ${outpath}
 
 result="${outpath}/${prog}-plot-${ylabel%.f*}_vs_${xlabel%.f*}"
-
-# threads for nucmer only
-multi=""
-if [ -n "${threads}" ]; then
-	multi="-t ${threads}"
-fi
 
 # build the command
 stamp=$(date +%s)
