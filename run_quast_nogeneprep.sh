@@ -40,7 +40,7 @@ fi
 refg=$(find reference -name "*.f*a")
 annot=$(find reference -name "*.gff?")
 
-thr=24
+thr=16
 
 # add gene predictions
 #        --gene-finding \
