@@ -2,8 +2,9 @@
 
 # light revision of the dotPlotly script pafCoordsDotPlotly.R
 # from https://github.com/tpoorten/dotPlotly (thanks for the great code)
-# * leave path befoer file name
+# * leave path before file name
 # * add optional axis labels for plot
+# * resize width when adding legend to keep ~square ratio
 
 ## Make Dot Plot with Percent Divergence on color scale
 suppressPackageStartupMessages(library(optparse))
