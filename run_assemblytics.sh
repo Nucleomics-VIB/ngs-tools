@@ -4,42 +4,60 @@
 #
 # Requirements:
 # run on a unix computer
-# nucmer (mummer3 apps) and Assemblytics both in $PATH
+# nucmer (mummer4 apps) and Assemblytics both in $PATH
+# R packages for plotting
 # two related fasta references to be compared
 #
 # Stephane Plaisance (VIB-NC+BITS) 2017/11/27; v1.0
 #
+# v1.1: mummer4 nucmer is now multithreaded
+#  updated Assemblytics 1.2 on 2020_03_27 from github
+#  https://github.com/MariaNattestad/Assemblytics
+#
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.0, 2017_11_27"
+version="1.1, 2020_03_27"
 
-# path to the Assemblytics scripts
-default_path_to_scripts="/opt/biotools/Assemblytics/"
+# path to the Assemblytics scripts should be in PATH
+# default_path_to_scripts="/opt/biotools/Assemblytics/scripts"
 
-usage='# Usage: run_assemblytics.sh -x <reference assembly> -y <de-novo assembly>
+usage='# Usage: run_assemblytics.sh -x <reference (fasta)> -y <query-asm fasta)>
 # script version '${version}'
 # [optional: -o <result folder|Assemblytics_results>]
 # [optional: -w <uniqseqlen|10000>]
+# [optional: -m <min variant length|50>]
+# [optional: -M <max variant length|10000>]
+# [optional: -t <threads for alignment (4)>]
 # [optional: -p <path to scripts|default set in the code>]
 # [optional: -h <this help text>]'
 
-while getopts "x:y:o:w:p:h" opt; do
+while getopts "x:y:o:w:m:M:t:h" opt; do
   case $opt in
     x) assembly1=${OPTARG} ;;
     y) assembly2=${OPTARG} ;;
     o) outpathopt=${OPTARG} ;;
     w) uniqseqlen=${OPTARG} ;;
-    p) p2script=${OPTARG} ;;
+    m) minl=${OPTARG} ;;
+    M) maxl=${OPTARG} ;;
+    t) threads=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
     *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
   esac
 done
 
-# defaults
-path_to_scripts=${p2script:-${default_path_to_scripts}}
+# check executables present
+declare -a arr=( "nucmer"  "R" "Assemblytics" )
+for prog in "${arr[@]}"; do
+$( hash ${prog} 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
+done
+
+# defaults parameters
 uniq_seq_len=${uniqseqlen:-"10000"}
+minlen=${minl:-50}
+maxlen=${maxl:-10000}
+thr=${threads:-4}
 
 # test if minimal arguments were provided
 if [ -z "${assembly1}" ]
@@ -50,26 +68,21 @@ then
 fi
 
 if [ ! -f "${assembly1}" ]; then
-	echo "${assembly1} file not found!"
-	exit 1
+    echo "${assembly1} file not found!"
+    exit 1
 fi
 
 if [ -z "${assembly2}" ]
 then
-	echo "#  no second assembly provided!"
-	echo "${usage}"
-	exit 1
+    echo "#  no second assembly provided!"
+    echo "${usage}"
+    exit 1
 fi
 
 if [ ! -f "${assembly2}" ]; then
     echo "${assembly2} file not found!";
     exit 1
 fi
-
-# check if nucmer requirements are present
-prog="Assemblytics"
-$( hash ${prog} 2>/dev/null ) || ( echo "# ${prog} not found in PATH (nucmer or promer?)"; exit 1 )
-$( hash nucmer 2>/dev/null ) || ( echo "# mummer not found in PATH"; exit 1 )
 
 # other parameters or defaults
 outpath=${outpathopt:-"Assemblytics_results"}
@@ -78,38 +91,46 @@ asm2=$(basename ${assembly2%.f*})
 deltabase=${asm2}_vs_${asm1}
 mkdir -p ${outpath}
 
-# build the nucmer command
-nucmercmd="nucmer -maxmatch -l 100 -c 500 \
-	${assembly1} \
-	${assembly2} \
-	-prefix ${outpath}/${deltabase} \
-	> ${outpath}/assemblytics-log.txt 2>&1"
+# build the nucmer4 command
+nucmercmd="nucmer \
+    --maxmatch \
+    --threads=${thr} \
+    --minmatch=100 \
+    --mincluster=500 \
+    ${assembly1} \
+    ${assembly2} \
+    --prefix=${outpath}/${deltabase} \
+    > ${outpath}/assemblytics-log.txt 2>&1"
 
-# show and execute	
-echo "# pairwise alignments with nucmer: ${nucmercmd}"
+# show and execute
+echo "## pairwise alignments with nucmer:"
+echo "# ${nucmercmd}"
 eval ${nucmercmd}
 
 # check for failure
 if [ $? -ne 0 ]; then
-	echo "# the nucmer command failed, please check your inputs"
-	exit 0
+    echo "# the nucmer command failed, please check your inputs"
+    exit 0
 fi
 
 # build the Assemblytics command
-cmd="(Assemblytics ${outpath}/${deltabase}.delta \
-	${outpath}/${asm2}_contigs \
-	${uniq_seq_len} \
-	${path_to_scripts}) \
-	>> ${outpath}/assemblytics-log.txt 2>&1"
+cmd="Assemblytics ${outpath}/${deltabase}.delta \
+    ${outpath}/${deltabase} \
+    ${uniq_seq_len} \
+    ${minlen} \
+    ${maxlen} \
+    >> ${outpath}/assemblytics-log.txt 2>&1"
 
-# show and execute	
-echo "# Assemblytics analysis: ${cmd}"
+# show and execute
+echo
+echo "## Assemblytics analysis:"
+echo "# ${cmd}"
 eval ${cmd}
- 
+
 exit 0
 
 ########################################################################################
 # man pages for the main executables used above
 
 # Usage:
-# Assemblytics delta output_prefix unique_length_required path_to_R_scripts
+# Assemblytics delta output_prefix unique_length_required min_size max_size
