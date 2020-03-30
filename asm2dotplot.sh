@@ -22,9 +22,10 @@ usage='# Usage: asm2dotplot.sh
 # -k <alt | plot only the first k reference records (undef)>
 # -q <min query-length (1000)>
 # -m <min alignment length (1000)>
-# -T <threads for minimap2 job (4)>
+# -l <horizontal lines on plot for separating scaffolds (FALSE)>
 # -s <color alignments by % identity (FALSE)>
 # -t <calculation of % identity for on-target alignments only (FALSE)>
+# -T <threads for minimap2 job (4)>
 # -h <this help>
 # script version '${version}'
 # [-h for this help]'
@@ -32,8 +33,9 @@ usage='# Usage: asm2dotplot.sh
 # default to no-color
 colored=""
 ontarget=""
+drawlines=""
 
-while getopts "R:Q:o:r:k:q:m:T:a:b:tsh" opt; do
+while getopts "R:Q:o:r:k:q:m:T:a:b:tslh" opt; do
   case $opt in
     R) reference=${OPTARG} ;;
     Q) query=${OPTARG} ;;
@@ -44,9 +46,10 @@ while getopts "R:Q:o:r:k:q:m:T:a:b:tsh" opt; do
     m) optmalen=${OPTARG} ;;
     s) colored=" -s" ;;
     t) ontarget=" -t" ;;
-    T) optthr=${OPTARG} ;;
+    l) drawlines=" -l" ;;
     a) optxlabel=${OPTARG} ;;
     b) optylabel=${OPTARG} ;;
+    T) optthr=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
     *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
@@ -147,7 +150,7 @@ cmd="pafCoordsDotPlotly_SP.R \
     -a ${xlabel} \
     -b ${ylabel} \
     -x \
-    ${xlimit} ${colored} ${ontarget}"
+    ${xlimit} ${colored} ${ontarget} ${drawlines}"
 
 echo "# ${cmd}" | tee -a ${outfolder}/${log}
 eval ${cmd} 2>&1 | tee -a ${outfolder}/${log}
