@@ -157,21 +157,54 @@ alignments <- alignments %>%
 # alignments = alignments[which(alignments$lenAln > opt$min_align),]
 
 # re-filter queries by alignment length, for now include overlapping intervals
-queryLenAgg = tapply(alignments$lenAln, alignments$queryID, sum)
-alignments = alignments[which(alignments$queryID %in% names(queryLenAgg)[which(queryLenAgg > opt$min_query_aln)]),]
+
+alignments <- alignments %>%
+  group_by(queryID) %>%
+  mutate(queryLenAgg = sum(lenAln)) %>%
+  ungroup() %>%
+  filter(queryLenAgg > opt$min_query_aln) %>%
+  select(-c(queryLenAgg))
+
+# queryLenAgg = tapply(alignments$lenAln, alignments$queryID, sum)
+# alignments = alignments[which(alignments$queryID %in% names(queryLenAgg)[which(queryLenAgg > opt$min_query_aln)]),]
 
 cat(paste0("\nAfter filtering... Number of alignments: ", nrow(alignments),"\n"))
 cat(paste0("After filtering... Number of query sequences: ", length(unique(alignments$queryID)),"\n\n"))
 
 # sort df on ref
-alignments$refID = factor(alignments$refID, levels = refIDsToKeepOrdered) # set order of refID
-alignments = alignments[with(alignments,order(refID,refStart)),]
-chromMax = tapply(alignments$refEnd, alignments$refID, max)
+#alignments$refID = factor(alignments$refID, levels = refIDsToKeepOrdered) # set order of refID
+#alignments = alignments[with(alignments,order(refID,refStart)),]
+#chromMax = tapply(alignments$refEnd, alignments$refID, max)
 
 # make new ref alignments for dot plot
 if(length(levels(alignments$refID)) > 1){
-  alignments$refStart2 = alignments$refStart + sapply(as.character(alignments$refID), function(x) ifelse(x == names((chromMax))[1], 0, cumsum(as.numeric(chromMax))[match(x, names(chromMax)) - 1]) )
-  alignments$refEnd2 = alignments$refEnd +     sapply(as.character(alignments$refID), function(x) ifelse(x == names((chromMax))[1], 0, cumsum(as.numeric(chromMax))[match(x, names(chromMax)) - 1]) )
+
+# create a table of max refEnd
+ref.add <- alignments %>%
+  arrange(factor(alignments$refID, levels = refIDsToKeepOrdered), refStart)
+  select(refID, refEnd) %>%
+  arrange(refEnd) %>%
+  group_by(refID) %>%
+  mutate(maxEnd = max(refEnd)) %>%
+  slice(n()) %>%
+  ungroup() %>%
+  mutate(cumlen = cumsum(as.numeric(maxEnd))) %>%
+  mutate(cumlen = cumlen - first(cumlen))
+
+# add merged ref coordinates
+alignments <- alignments %>%
+  arrange(factor(alignments$refID, levels = refIDsToKeepOrdered), refStart)
+  left_join(select(ref.add, refID, cumlen), by="refID") %>%
+  mutate(refStart2 = refStart + cumlen) %>%
+  mutate(refEnd2 = refEnd + cumlen) %>%
+  select(-c(chromMax, cumlen))
+
+rm(ref.add)
+
+#  alignments$refStart2 = alignments$refStart + 
+#    sapply(as.character(alignments$refID), function(x) ifelse(x == names((chromMax))[1], 0, cumsum(as.numeric(chromMax))[match(x, names(chromMax)) - 1]) )
+#  alignments$refEnd2 = alignments$refEnd + 
+#    sapply(as.character(alignments$refID), function(x) ifelse(x == names((chromMax))[1], 0, cumsum(as.numeric(chromMax))[match(x, names(chromMax)) - 1]) )
 } else {
   alignments$refStart2 = alignments$refStart
   alignments$refEnd2 = alignments$refEnd
