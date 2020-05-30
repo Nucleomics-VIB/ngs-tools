@@ -119,18 +119,18 @@ echo "# ${cmd}"
 eval ${cmd}
 
 # concat all results
-concat=${outdir}/merged_results.vcf
+concat=${outdir}/merged_results
 
 if [ $? -eq 0 ]; then
-vcf-concat $(find ${outdir} -type f ! -size 0 -name "*.vcf" -not -name "merged_results.vcf" -exec echo -n \'"{}"\'\  \; | tr '\n' ' ') \
-	> ${concat}
+vcf-concat ${outdir}/*.vcf > ${concat}
 fi
 
 # sort compress index
 if [ -f ${concat} ]; then
-( grep ^"#" ${concat}; grep -v ^"#" ${concat} | sort "-k 1V,1 -k 2n,2" ) | \
+( grep ^"#" ${concat}; grep -v ^"#" ${concat} | sort -k 1V,1 -k 2n,2 ) | \
 	bgzip -c > ${outdir}/${outpref}".vcf.gz" && \
-	tabix -f -p vcf ${outdir}/${outpref}".vcf.gz"
+	tabix -f -p vcf ${outdir}/${outpref}".vcf.gz" && \
+	rm ${concat}
 
 echo "# all done."
 else
