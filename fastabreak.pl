@@ -53,7 +53,7 @@ die "# break is further than the sequence end";
 my $seq_obj1 = Bio::Seq->new(-seq => $seq->subseq(1,$break),
                          -alphabet => 'dna',
                          -display_id => $seq->display_id(),
-                         -desc => $seq->desc()
+                         -desc => $seq->desc()." break_at_$break"
                          );
                          
                          
