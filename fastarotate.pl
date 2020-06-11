@@ -46,7 +46,8 @@ my $seqIN = Bio::SeqIO->new(-file => "$inpath", -format=>"Fasta");
 my $seq = $seqIN->next_seq();
 my $len = $seq->length;
 
-if ( $break gt $len ){
+# test end
+if ( $break > $len ){
 die "# break is further than the sequence end";
 }
 
