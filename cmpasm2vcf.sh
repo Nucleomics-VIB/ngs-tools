@@ -49,7 +49,7 @@ fi
 
 # required
 # check executables present
-declare -a arr=( "k8" "paftools.js" "minimap2" )
+declare -a arr=( "k8" "paftools.js" "minimap2" "vcf-annotate")
 for prog in "${arr[@]}"; do
 $( hash ${prog} 2>/dev/null ) || \
     ( echo "# required ${prog} not found in PATH"; exit 1 )
@@ -66,9 +66,35 @@ ${minimap2} -c --cs ${ref} ${query} \
 | ${k8} ${paftools} call \
   -f ${ref} \
   -L ${minl} - \
-  > ${query%.fa*}_vs_${ref%.fa*}.vcf \
-2> ${query%.fa*}_vs_${ref%.fa*}.log
+  > $(basename ${query%.fa*})_vs_$(basename ${ref%.fa*}).vcf \
+2> $(basename ${query%.fa*})_vs_$(basename ${ref%.fa*}).log
 
 endts=$(date +%s)
 dur=$(echo "${endts}-${startts}" | bc)
 echo "Done in ${dur} sec"
+
+# summary
+echo
+echo "# variant count per type"
+cat $(basename ${query%.fa*})_vs_$(basename ${ref%.fa*}).vcf \
+| vcf-annotate --fill-type \
+| grep -v '^#' \
+| gawk '
+  BEGIN{
+  FS="\t"; OFS="\t"
+  
+  }
+  {
+  match($8, /TYPE=([^ ]+)/, arr); 
+  type=arr[1]; 
+  len=sqrt((length($5)-length($4))^2); 
+  cnt[type]++; 
+  tot[type]+=len
+  }
+  
+  END{
+  print"# differences between the query and reference include:"
+  printf "%s: %i (%i bases)\n", "snp", cnt["snp"], cnt["snp"];
+  printf "%s: %i (%i bases)\n", "del", cnt["del"], tot["del"];
+  printf "%s: %i (%i bases)\n", "ins", cnt["ins"], tot["ins"]
+  }'

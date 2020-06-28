@@ -96,7 +96,7 @@ cmd="freebayes \
 	${moreopt} \
 	${bamfile} > ${outfile}"
 
-# show and execute	
+# show and execute
 echo "# ${cmd}"
 eval ${cmd}
 

@@ -3,7 +3,7 @@
 # mummer_biplot.sh: produce a pairwise plot from two fasta sequences
 #
 # Requirements:
-# run on a unix computer installed with mummer3 (mummer apps in $PATH)
+# run on a unix computer installed with mummer3+ (mummer apps in $PATH)
 # two related fasta references to be compared
 #
 # Stephane Plaisance (VIB-NC+BITS) 2017/09/22; v1.0
@@ -28,7 +28,6 @@ while getopts "x:y:o:c:p:t:I:L:f:T:h" opt; do
 	case $opt in
 		x) assembly1=${OPTARG} ;;
 		y) assembly2=${OPTARG} ;;
-		p) mummerpath=${OPTARG} ;;
 		o) outpathopt=${OPTARG} ;;
 		f) format=${OPTARG} ;;
 		c) clust=${OPTARG} ;;
