@@ -141,7 +141,7 @@ xlimit="-r ${optrlst}"
 fi
 
 xlabel=${optxlabel:-"$(basename ${reference%%.fa*})"}
-ylabel=${optxlabel:-"$(basename ${query%%.fa*})"}
+ylabel=${optylabel:-"$(basename ${query%%.fa*})"}
 
 cmd="pafCoordsDotPlotly_SP.R \
     -i ${outfolder}/${outpfx}.paf \
