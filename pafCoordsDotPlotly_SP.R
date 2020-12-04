@@ -87,8 +87,16 @@ if(opt$v){
 # do not remove path from file name in order to save in a folder
 # opt$output_filename = unlist(strsplit(opt$output_filename, "/"))[length(unlist(strsplit(opt$output_filename, "/")))]
 
-# read in alignments
-alignments = read.table(opt$input_filename, stringsAsFactors = F, fill = T)
+# read in alignments and ignore late columns
+alignments = read.table(opt$input_filename, 
+    row.names = NULL
+    colClasses = c(rep("character", 1),
+                   rep("numeric", 3),
+                   rep("character", 2),
+                   rep("numeric", 6),
+                   rep("NULL", 12)),
+    stringsAsFactors = F, 
+    fill = T)
 
 # set column names
 # PAF IS ZERO-BASED - CHECK HOW CODE WORKS

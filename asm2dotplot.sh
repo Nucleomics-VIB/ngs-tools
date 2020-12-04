@@ -19,7 +19,7 @@ usage='# Usage: asm2dotplot.sh
 # -Q <query asm (.fa* or fa*.gz)>
 # -a <label for x-axis (default to R)>
 # -b <label for y-axis (default to Q)>
-# -o <output folder ("dotplot")>
+# -o <output folder ("asm2dotplot")>
 # -r <comma-separated ordered-list of reference records (undef)>
 # -k <alt | plot only the first k reference records (undef)>
 # -q <min query-length (1000)>
