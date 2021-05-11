@@ -3,17 +3,24 @@
 # script: get_ENSembl_ref.sh
 # Aim: download a set of homo sapiens reference files
 # create accessory files and indices
+# required Picard and other tools
 #
 # Stéphane Plaisance - VIB-Nucleomics Core - 2020-02-28 v1.0
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
-usage='# Usage: get_ENSembl_ref.sh -o <organism (homo_sapiens)> -p <build name (Homo_sapiens.GRCh38)> -b <ensembl build (99)>
+usage='# Usage: get_ENSembl_ref.sh -o <organism (homo_sapiens)> -p <build name (Homo_sapiens.GRCh38)> -b <ensembl build (104)>
 # script version '${version}'
 # [optional: -h <this help text>]'
 
 # check parameters for your system
 version="1.01, 2021-05-11"
+
+# check executables present (not checking Picard)
+declare -a arr=( "grep" "sed" "wget" "samtools")
+for prog in "${arr[@]}"; do
+$( hash ${prog} 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
+done
 
 while getopts "o:p:b:h" opt; do
   case $opt in
@@ -31,7 +38,10 @@ done
 # pfx=${pfx_opt:-"Mus_musculus.GRCm38"}
 org=${org_opt:-"homo_sapiens"}
 pfx=${pfx_opt:-"Homo_sapiens.GRCh38"}
-build=${build_opt:-"104"}
+
+# get latest build number live
+latest=$(wget  -q -O - http://ftp.ensembl.org/pub/current_README | grep "Ensembl Release" | sed 's/^Ensembl Release \(.*\) Databases.$/\1/')
+build=${build_opt:-${latest}}
 
 #########################################
 # get the data from ensEMBL FTP         #
@@ -81,6 +91,10 @@ java -jar $PICARD/picard.jar CreateSequenceDictionary \
 exit 0
 
 # GenCode
+# human (build v38)
+# http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_38/gencode.v38.annotation.gtf.gz
+# http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_38/gencode.v38.annotation.gff3.gz
+
 # human (build v33)
 # ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_33/
 # ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_33/gencode.v33.annotation.gff3.gz
