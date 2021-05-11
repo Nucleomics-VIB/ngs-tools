@@ -76,7 +76,7 @@ function enrich_run() {
 		--limitPrintResults ${limitPrintResults} \
 		--outputDir ${outdir} \
 		--genome ${genome} \
-		${gene_name} \
+		--targets ${gene_name} \
 		> ${outdir}/results.txt \
 		2> ${outdir}/python.err
 	}
