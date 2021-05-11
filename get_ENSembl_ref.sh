@@ -13,7 +13,7 @@ usage='# Usage: get_ENSembl_ref.sh -o <organism (homo_sapiens)> -p <build name (
 # [optional: -h <this help text>]'
 
 # check parameters for your system
-version="1.0, 2020-02-28"
+version="1.01, 2021-05-11"
 
 while getopts "o:p:b:h" opt; do
   case $opt in
@@ -31,7 +31,7 @@ done
 # pfx=${pfx_opt:-"Mus_musculus.GRCm38"}
 org=${org_opt:-"homo_sapiens"}
 pfx=${pfx_opt:-"Homo_sapiens.GRCh38"}
-build=${build_opt:-"99"}
+build=${build_opt:-"104"}
 
 #########################################
 # get the data from ensEMBL FTP         #
