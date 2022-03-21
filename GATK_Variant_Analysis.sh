@@ -250,7 +250,7 @@ outfolder=gatk_variantcalling
 mkdir -p ${outfolder}
 
 # dbSNP for ID-field annotation
-dbsnp=reference/gallus_gallus_snv.vcf.gz
+dbsnp="reference/GCA_000002315.5_current_ids.vcf.gz"
 
 if [ ! -f gatk_variantcalling/calling_done ]; then
 # call short variants to gvcf format and save supporting reads
@@ -269,7 +269,17 @@ java ${javaopts} -jar $GATK/gatk.jar \
 	--bam-output ${outfolder}/${samplename}_HC_aligned_reads.bam \
 	--tmp-dir tmpfiles/ 
 	
-# convert to multi-VCF (merged samples)
+# convert to multi-VCF (merge samples)
+#java ${javaopts} -jar $GATK/gatk.jar \
+#	CombineGVCFs \
+#	--reference ${reference_fa} \ \
+#	--variant output1.g.vcf.gz \
+#	--variant output2.g.vcf.gz \
+#	--variant output3.g.vcf.gz \
+#	-O ${outfolder}/combined.g.vcf.gz \
+#	--tmp-dir tmpfiles/
+
+# convert (multi-)gVCF to (multi-)VCF and add dbSNP IDs
 # https://software.broadinstitute.org/gatk/documentation/article?id=11813
 java ${javaopts} -jar $GATK/gatk.jar \
 	GenotypeGVCFs \
@@ -294,7 +304,6 @@ else
 	echo "# GATK calling already done"
 fi
 
-
 #############################################
 # GATK4 VARIANT RECALIBRATION
 #############################################
@@ -306,8 +315,10 @@ mkdir -p ${outfolder}
 ## variants-sets
 
 # Known sites resource, not used in training: dbSNP
-snv=reference/gallus_gallus_snv.vcf.gz
-indels=reference/gallus_gallus_indels.vcf.gz
+dbsnp="reference/GCA_000002315.5_current_ids.vcf.gz"
+snv="reference/gallus_gallus_snv_cor_dedup.vcf.gz"
+isec="reference/GRCg6a_shared_variants.vcf.gz"
+indels="reference/gallus_gallus_indels_cor_dedup.vcf.gz"
 
 # maxgaussians default to 8 is too high for chr22-only calls
 maxSNPgaussians=6
@@ -320,16 +331,17 @@ cp gatk_variantcalling/${samplename}_excesshet_filtered.vcf.gz* ${outfolder}/
 # extract a 6-column version of the data for recalibration
 java ${javaopts} -jar $GATK/gatk.jar \
 	MakeSitesOnlyVcf \
-	-I ${outfolder}/${samplename}_excesshet_filtered.vcf.gz \
-	-O ${outfolder}/${samplename}_excesshet_sitesonly.vcf.gz
+	-I ${outfolder}/${samplename}_hard-filtered.vcf.gz \
+	-O ${outfolder}/${samplename}_hard-filtered_sitesonly.vcf.gz
 
 # Build the SNP recalibration model
 java ${javaopts} -jar $GATK/gatk.jar \
 	VariantRecalibrator \
 	-R ${reference_fa} \
-	-V ${outfolder}/${samplename}_excesshet_sitesonly.vcf.gz \
+	-V ${outfolder}/${samplename}_hard-filtered_sitesonly.vcf.gz \
 	-O ${outfolder}/${samplename}_recalibrate_SNP.recal.vcf.gz \
-	--resource:dbsnp,known=true,training=false,truth=false,prior=2.0 ${snv} \
+	--resource:dbsnp,known=true,training=true,truth=true,prior=12.0 ${isec} \
+	--resource:EBI_snv,known=false,training=false,truth=false,prior=2.0 ${snv} \
 	--trust-all-polymorphic \
 	--use-annotation DP \
 	--use-annotation QD \
@@ -361,9 +373,10 @@ java ${javaopts} -jar $GATK/gatk.jar \
 java ${javaopts} -jar $GATK/gatk.jar \
 	VariantRecalibrator \
 	-R ${reference_fa} \
-	-V ${outfolder}/${samplename}_excesshet_sitesonly.vcf.gz \
+	-V ${outfolder}/${samplename}_hard-filtered_sitesonly.vcf.gz \
 	-O ${outfolder}/${samplename}_recalibrate_indels.recal.vcf.gz \
-	--resource:dbsnp,known=true,training=false,truth=false,prior=2 ${indels} \
+	--resource:dbsnp,known=true,training=true,truth=true,prior=12.0 ${isec} \
+	--resource:EBI_indels,known=true,training=false,truth=false,prior=2 ${indels} \
 	--trust-all-polymorphic \
 	--use-annotation QD \
 	--use-annotation DP \
@@ -396,7 +409,7 @@ java ${javaopts} -jar $GATK/gatk.jar \
 java ${javaopts} -jar $GATK/gatk.jar \
 	ApplyVQSR \
 	-R ${reference_fa} \
-	-V ${outfolder}/${samplename}_excesshet_filtered.vcf.gz \
+	-V ${outfolder}/${samplename}_hard-filtered_sitesonly.vcf.gz \
 	-O ${outfolder}/${samplename}_recalibrated_snps_raw_indels.vcf.gz \
 	--mode SNP \
 	--recal-file ${outfolder}/${samplename}_recalibrate_SNP.recal.vcf.gz \
@@ -421,7 +434,6 @@ else
 	echo "# GATK variant recalibration already done"
 fi
 
-
 #############################################
 # SnpEff on VQSR
 #############################################
@@ -434,6 +446,7 @@ build="GRCg6a.105"
 if [ ! -f snpeff/VQSR_annotation_done ]; then
 java ${javaopts} -jar $SNPEFF/snpEff.jar \
 	-htmlStats ${outfolder}/gatk_recal_snpEff_summary.html \
+	-nodownload \
 	${build} \
 	gatk_variantrecalibration/${samplename}_VQSR.vcf.gz | \
 	bgzip -c > ${outfolder}/${samplename}_VQSR_snpeff.vcf.gz && \
@@ -443,35 +456,57 @@ else
 	echo "# SNPEff annotation for VQSR variant already done"
 fi
 
-
 #############################################
 # GATK4 VARIANT HARD FILTERING
 #############################################
+
+if [ ! -f gatk_varianthardfiltering/hardFiltering_recalibation_done ]; then
+
+# also mark ExcessHet
+threshold=54.69
+
+outfolder=gatk_varianthardfiltering
+mkdir -p ${outfolder}
+
+###########################################
+# alt) Chicken hard filtering
+###########################################
+
+# from https://www.nature.com/articles/s41422-020-0349-y
+# - MQ < 25.0
+# - QUAL < 40.0
+# - MQ0 ≥ 4 && ((MQ0/(1.0*DP)) > 0.1)
+# --cluster-size 3
+# --cluster-window-size 10 (flag more than 3 clustered variants within 10bps +++)
+
+#java ${javaopts} -jar $GATK/gatk.jar \
+#	VariantFiltration \
+#	--variant gatk_variantcalling/${samplename}.vcf.gz \
+#	--filter-expression "ExcessHet > ${threshold}" \
+#	--filter-name "ExcessHet" \
+#	--filter-expression "MQ < 25.0" \
+#   --filter-name "MQ25" \
+#	--filter-expression "QUAL < 40.0" \
+#   --filter-name "QUAL40" \
+#   --cluster-size 3 \
+#   --cluster-window-size 10 \
+#	-O ${outfolder}/${samplename}_hard-filtered.vcf.gz \
+#	--tmp-dir tmpfiles/
+
+###########################################
+# 1) hard-Filter SNPs on multiple metrics
+###########################################
 
 # instructions and filters from:
 # https://gatkforums.broadinstitute.org/gatk/discussion/23216/how-to-filter-variants-either-with-vqsr-or-by-hard-filtering
 # Genepattern: QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0 || SOR > 3.0 || QUAL < 30
 
-outfolder=gatk_varianthardfiltering
-mkdir -p ${outfolder}
-
-if [ ! -f gatk_varianthardfiltering/hardFiltering_recalibation_done ]; then
-
-# copy the GenotypeGVCFs vcf output with marked excesshet output from above
-# create local copy of previous file
-cp gatk_variantcalling/${samplename}_excesshet_filtered.vcf.gz* ${outfolder}/
-
-
-###########################################
-# 2) hard-Filter SNPs on multiple metrics
-###########################################
-
 # produces a VCF with records with SNP-type variants only.
 java ${javaopts} -jar $GATK/gatk.jar \
 	SelectVariants \
-	-V ${outfolder}/${samplename}_excesshet_filtered.vcf.gz \
-	--select-type-to-include SNP \
-	-O ${outfolder}/${samplename}_snp.vcf.gz
+	-V ${outfolder}/${samplename}_hard-filtered.vcf.gz \
+	-O ${outfolder}/${samplename}_snp.vcf.gz \
+	--select-type-to-include SNP
 
 # This produces a VCF with the same variant records now annotated with filter status. Specifically, if a record passes all the filters, it receives a PASS label in the FILTER column.
 # A record that fails a filter #receives the filter name in the FILTER column, e.g. SOR3.
@@ -486,19 +521,22 @@ java ${javaopts} -jar $GATK/gatk.jar \
 	--filter "SOR > 3.0" --filter-name "SOR3" \
 	--filter "FS > 60.0" --filter-name "FS60" \
 	--filter "MQ < 40.0" --filter-name "MQ40" \
-	--filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" \
-	--filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8"
+    --cluster-size 3 \
+    --cluster-window-size 10 \
 
+# not applicable to chicken data
+#	--filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" \
+# 	--filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" \
 
 ######################################################
-# 3) hard-Filter INDELs and MIXED on multiple metrics
+# 2) hard-Filter INDELs and MIXED on multiple metrics
 ######################################################
 
 # produces a VCF with records with INDEL-type variants only.
 java ${javaopts} -jar $GATK/gatk.jar \
 	SelectVariants \
-	-V ${outfolder}/${samplename}_excesshet_filtered.vcf.gz \
-	-O ${outfolder}/${samplename}_mixed_indels.vcf.gz \
+	-V ${outfolder}/${samplename}_hard-filtered.vcf.gz \
+	-O ${outfolder}/${samplename}_mixed_indels.vcf.gz
 	--select-type-to-include INDEL \
 	--select-type-to-include MIXED
 
@@ -509,11 +547,14 @@ java ${javaopts} -jar $GATK/gatk.jar \
 	--filter "QD < 2.0" --filter-name "QD2" \
 	--filter "QUAL < 30.0" --filter-name "QUAL30" \
 	--filter "FS > 200.0" --filter-name "FS200" \
-	--filter "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20"
-
+    --cluster-size 3 \
+    --cluster-window-size 10
+	
+# not applicable to chicken data
+#	--filter "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20"
 
 ###########################################
-## 4) merge SNP and Indel filtered calls	
+## 3) merge SNP and Indel filtered calls	
 ###########################################
 
 # combine filtered into one file using Picard
@@ -524,10 +565,10 @@ java ${javaopts} -jar $GATK/gatk.jar \
 	-R ${reference_fa} \
 	-O ${outfolder}/${samplename}_snp_indel_filtered.vcf.gz && \
 	touch ${outfolder}/hardFiltering_recalibation_done
+
 else
 	echo "# GATK hardFiltering recalibration already done"
 fi
-
 
 #############################################
 # SnpEff on HardFiltering
@@ -541,6 +582,7 @@ build="GRCg6a.105"
 if [ ! -f snpeff/hardFiltering_annotation_done ]; then
 java ${javaopts} -jar $SNPEFF/snpEff.jar \
 	-htmlStats ${outfolder}/gatk_hardfiltering_snpEff_summary.html \
+	-nodownload \
 	${build} \
 	gatk_varianthardfiltering/${samplename}_snp_indel_filtered.vcf.gz | \
 	bgzip -c > ${outfolder}/${samplename}_hardfiltering_snpeff.vcf.gz && \
