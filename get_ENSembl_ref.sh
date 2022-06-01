@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # script: get_ENSembl_ref.sh
-# Aim: download a set of homo sapiens reference files
+# Aim: download a set of eg 'homo sapiens' reference files
+# NOTE: will not work for all organisms due to ensembl file tree inconsistency
 # create accessory files and indices
 # required Picard and other tools
 #
@@ -9,7 +10,7 @@
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
-usage='# Usage: get_ENSembl_ref.sh -o <organism (homo_sapiens)> -p <build name (Homo_sapiens.GRCh38)> -b <ensembl build (104)>
+usage='# Usage: get_ENSembl_ref.sh -o <organism (homo_sapiens)> -p <build name (Homo_sapiens.GRCh38)> -b <ensembl build (106)>
 # script version '${version}'
 # [optional: -h <this help text>]'
 
@@ -59,11 +60,16 @@ translnk="ftp://${baseurl}/fasta/${org}/cdna/${pfx}.cdna.all.fa.gz"
 ann1lnk="ftp://${baseurl}/gff3/${org}/${pfx}.${build}.chr.gff3.gz"
 ann2lnk="ftp://${baseurl}/gtf/${org}/${pfx}.${build}.chr.gtf.gz"
 
+# variants (may not all exist!)
+varlnk1="ftp://${baseurl}/variation/vcf/${org}/${org}.vcf.gz"
+varlnk2="ftp://${baseurl}/variation/vcf/${org}/${org}_somatic.vcf.gz"
+varlnk3="ftp://${baseurl}/variation/vcf/${org}/${org}_structural_variations.vcf.gz"
+
 outfolder="${pfx}.${build}"
 mkdir -p ${outfolder}
 
 # get the goods
-for lnk in ${asmlnk} ${translnk} ${ann1lnk} ${ann2lnk}; do
+for lnk in ${asmlnk} ${translnk} ${ann1lnk} ${ann2lnk} ${varlnk1} ${varlnk2} ${varlnk3}; do
 wget -P ${outfolder} ${lnk}
 done
 
@@ -72,7 +78,12 @@ done
 #########################################
 
 for f in ${outfolder}/*.gz; do
-gunzip ${f}
+gunzip -f ${f}
+done
+
+# recompress VCF and index
+for v in ${outfolder}/*.vcf; do
+vcf2index ${outfolder}/*.vcf
 done
 
 # create fasta fai
@@ -86,7 +97,6 @@ awk 'BEGIN{FS="\t"; OFS="\t"}{print $1, $2}' ${outfolder}/${pfx}.dna.primary_ass
 java -jar $PICARD/picard.jar CreateSequenceDictionary \
 	R=${outfolder}/${pfx}.dna.primary_assembly.fa \
 	O=${outfolder}/${pfx}.dna.primary_assembly.dict
-
 
 exit 0
 
