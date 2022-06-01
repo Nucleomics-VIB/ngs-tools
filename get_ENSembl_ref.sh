@@ -10,12 +10,12 @@
 #
 # visit our Git: https://github.com/Nucleomics-VIB
 
+# last edits
+version="1.02, 2022-06-01"
+
 usage='# Usage: get_ENSembl_ref.sh -o <organism (homo_sapiens)> -p <build name (Homo_sapiens.GRCh38)> -b <ensembl build (106)>
 # script version '${version}'
 # [optional: -h <this help text>]'
-
-# check parameters for your system
-version="1.01, 2021-05-11"
 
 # check executables present (not checking Picard)
 declare -a arr=( "grep" "sed" "wget" "samtools")
@@ -23,11 +23,12 @@ for prog in "${arr[@]}"; do
 $( hash ${prog} 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
 done
 
-while getopts "o:p:b:h" opt; do
+while getopts "o:p:b:t:h" opt; do
   case $opt in
     o) org_opt=${OPTARG} ;;
     p) pfx_opt=${OPTARG} ;;
     b) build_opt=${OPTARG} ;;
+    t) nthr_opt=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
     *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
@@ -39,6 +40,7 @@ done
 # pfx=${pfx_opt:-"Mus_musculus.GRCm38"}
 org=${org_opt:-"homo_sapiens"}
 pfx=${pfx_opt:-"Homo_sapiens.GRCh38"}
+nthr=${nthr_opt:-1}
 
 # get latest build number live
 latest=$(wget  -q -O - http://ftp.ensembl.org/pub/current_README | grep "Ensembl Release" | sed 's/^Ensembl Release \(.*\) Databases.$/\1/')
@@ -51,7 +53,8 @@ build=${build_opt:-${latest}}
 baseurl=ftp.ensembl.org/pub/release-${build}
 
 # genome assembly
-asmlnk="ftp://${baseurl}/fasta/${org}/dna/${pfx}.dna.primary_assembly.fa.gz"
+asmlnk1="ftp://${baseurl}/fasta/${org}/dna/${pfx}.dna.primary_assembly.fa.gz"
+asmlnk2="ftp://${baseurl}/fasta/${org}/dna/${pfx}.dna.toplevel.fa.gz"
 
 # transcripts
 translnk="ftp://${baseurl}/fasta/${org}/cdna/${pfx}.cdna.all.fa.gz"
@@ -64,12 +67,13 @@ ann2lnk="ftp://${baseurl}/gtf/${org}/${pfx}.${build}.chr.gtf.gz"
 varlnk1="ftp://${baseurl}/variation/vcf/${org}/${org}.vcf.gz"
 varlnk2="ftp://${baseurl}/variation/vcf/${org}/${org}_somatic.vcf.gz"
 varlnk3="ftp://${baseurl}/variation/vcf/${org}/${org}_structural_variations.vcf.gz"
+http://ftp.ensembl.org/pub/release-106/fasta/saccharomyces_cerevisiae/cdna/
 
 outfolder="${pfx}.${build}"
 mkdir -p ${outfolder}
 
 # get the goods
-for lnk in ${asmlnk} ${translnk} ${ann1lnk} ${ann2lnk} ${varlnk1} ${varlnk2} ${varlnk3}; do
+for lnk in ${asmlnk1} ${asmlnk2} ${translnk} ${ann1lnk} ${ann2lnk} ${varlnk1} ${varlnk2} ${varlnk3}; do
 wget -P ${outfolder} ${lnk}
 done
 
@@ -78,26 +82,36 @@ done
 #########################################
 
 for f in ${outfolder}/*.gz; do
-gunzip -f ${f}
+bgzip -@${nthr} -d -f ${f}
 done
 
 # re-compress VCF and index
 for v in ${outfolder}/*.vcf; do
-bgzip ${v} && \
+bgzip -@${nthr} ${v} && \
   tabix -p vcf ${v}.gz
 done
 
+# set main assembly
+if [ -f "${outfolder}/${pfx}.dna.primary_assembly.fa" ]; then
+asmfile="${outfolder}/${pfx}.dna.primary_assembly.fa"
+elif [ -f "${outfolder}/${pfx}.dna.toplevel.fa" ]; then
+asmfile="${outfolder}/${pfx}.dna.toplevel.fa"
+else
+echo "assembly file not found, quitting!"
+exit 1
+fi
+
 # create fasta fai
-samtools faidx ${outfolder}/${pfx}.dna.primary_assembly.fa
+samtools faidx ${asmfile}
 samtools faidx ${outfolder}/${pfx}.cdna.all.fa
 
 # create .genome file and sequence dictionary
-awk 'BEGIN{FS="\t"; OFS="\t"}{print $1, $2}' ${outfolder}/${pfx}.dna.primary_assembly.fa.fai \
-	> ${outfolder}/${pfx}.dna.primary_assembly.genome
+awk 'BEGIN{FS="\t"; OFS="\t"}{print $1, $2}' ${asmfile}.fai \
+	> ${asmfile%.fa}.genome
 
 java -jar $PICARD/picard.jar CreateSequenceDictionary \
-	R=${outfolder}/${pfx}.dna.primary_assembly.fa \
-	O=${outfolder}/${pfx}.dna.primary_assembly.dict
+	R=${asmfile} \
+	O=${asmfile%.fa}.dict
 
 exit 0
 
