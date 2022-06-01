@@ -81,9 +81,10 @@ for f in ${outfolder}/*.gz; do
 gunzip -f ${f}
 done
 
-# recompress VCF and index
+# re-compress VCF and index
 for v in ${outfolder}/*.vcf; do
-vcf2index ${outfolder}/*.vcf
+bgzip ${v} && \
+  tabix -p vcf ${v}.gz
 done
 
 # create fasta fai
