@@ -13,9 +13,12 @@
 # last edits
 version="1.02, 2022-06-01"
 
-usage='# Usage: get_ENSembl_ref.sh -o <organism (homo_sapiens)> -p <build name (Homo_sapiens.GRCh38)> -b <ensembl build (106)>
-# script version '${version}'
-# [optional: -h <this help text>]'
+usage='# Usage: get_ENSembl_ref.sh -o <organism (homo_sapiens)> 
+#  -p <build name (Homo_sapiens.GRCh38)> 
+#  -b <ensembl build (latest)>
+#  -t <compression threads (1)>
+#  -h <this help text>
+# script version '${version}
 
 # check executables present (not checking Picard)
 declare -a arr=( "grep" "sed" "wget" "samtools")
@@ -42,9 +45,11 @@ org=${org_opt:-"homo_sapiens"}
 pfx=${pfx_opt:-"Homo_sapiens.GRCh38"}
 nthr=${nthr_opt:-1}
 
-# get latest build number live
-latest=$(wget  -q -O - http://ftp.ensembl.org/pub/current_README | grep "Ensembl Release" | sed 's/^Ensembl Release \(.*\) Databases.$/\1/')
-build=${build_opt:-${latest}}
+# get current ENSembl build number
+current=$(wget  -q -O - http://ftp.ensembl.org/pub/current_README | \
+  grep "Ensembl Release" | \
+  sed 's/^Ensembl Release \(.*\) Databases.$/\1/')
+build=${build_opt:-${current}}
 
 #########################################
 # get the data from ensEMBL FTP         #
