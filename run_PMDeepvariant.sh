@@ -118,8 +118,9 @@ cmd="minimap2 \
           rm output/${pfx}_mappings.sam"
 
 # show and execute
+echo "# mapping reads to reference"
 echo "# ${cmd}"
-#eval ${cmd}
+time eval ${cmd}
 
 #################################
 # run pepper margin deepvariant #
@@ -133,6 +134,7 @@ param_haplotag="allParams.haplotag.pb-hifi.hapDup.json"
 param_phase="allParams.phase_vcf.pb-hifi.json"
 
 # Run PEPPER-Margin-DeepVariant
+echo "# running pepper_margin_deepvariant docker"
 time sudo docker run \
   -u "$(id -u):$(id -g)" \
   -v "${input_dir}":"/input" \

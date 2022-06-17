@@ -51,6 +51,10 @@ current=$(wget  -q -O - http://ftp.ensembl.org/pub/current_README | \
   sed 's/^Ensembl Release \(.*\) Databases.$/\1/')
 build=${build_opt:-${current}}
 
+asmname=$(wget -q -O -  https://fungi.ensembl.org/Saccharomyces_cerevisiae/Info/Index?db=core | \
+  grep "Genome assembly" | \
+  sed 's/.*<h2>Genome assembly: <a href=\".*\">\(.*\)<\/a><\/h2>.*/\1/')
+
 #########################################
 # get the data from ensEMBL FTP         #
 #########################################

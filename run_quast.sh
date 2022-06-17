@@ -9,9 +9,10 @@
 # required once: create a conda env to install the required apps
 # adapt next line to point to the right conda.sh init script
 # see conda activate script for details
+myenv=quast
 source /etc/profile.d/conda.sh
-conda activate atwork3 || \
-  ( echo "# the conda environment 'atwork3' adding BUSCO was not found on this machine" ;
+conda activate ${myenv} || \
+  ( echo "# the conda environment ${myenv} was not found on this machine" ;
     echo "# please read the top part of the script!" \
     && exit 1 )
 
