@@ -89,7 +89,7 @@ if(opt$v){
 
 # read in alignments and ignore late columns
 alignments = read.table(opt$input_filename, 
-    row.names = NULL
+    row.names = NULL,
     colClasses = c(rep("character", 1),
                    rep("numeric", 3),
                    rep("character", 2),
