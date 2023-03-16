@@ -264,9 +264,9 @@ if (opt$similarity) {
                                   size = .1) }} +
     scale_color_distiller(palette = "Spectral") +
     labs(color = "Mean Percent Identity (per query)", 
-         title = paste0(   paste0("Post-filtering number of alignments: ", nrow(alignments),"\t\t\t\t"),
+         title = paste0(   paste0("Post-filtering number of alignments: ", nrow(alignments),"        "),
                            paste0("minimum alignment length (-m): ", opt$min_align,"\n"),
-                           paste0("Post-filtering number of queries: ", length(unique(alignments$queryID)),"\t\t\t\t\t\t\t\t"),
+                           paste0("Post-filtering number of queries: ", length(unique(alignments$queryID)),"                "),
                            paste0("minimum query aggregate alignment length (-q): ", opt$min_query_aln)
          )) +
     xlab(opt$x_label) +
@@ -311,9 +311,9 @@ if (opt$similarity) {
                                   color = "grey60",
                                   size = .1) }} +
     labs(color = "Mean Percent Identity (per query)", 
-         title = paste0(   paste0("Post-filtering number of alignments: ", nrow(alignments),"\t\t\t\t"),
+         title = paste0(   paste0("Post-filtering number of alignments: ", nrow(alignments),"        "),
                            paste0("minimum alignment length (-m): ", opt$min_align,"\n"),
-                           paste0("Post-filtering number of queries: ", length(unique(alignments$queryID)),"\t\t\t\t\t\t\t\t"),
+                           paste0("Post-filtering number of queries: ", length(unique(alignments$queryID)),"                "),
                            paste0("minimum query aggregate alignment length (-q): ", opt$min_query_aln)
          )) +
     xlab(opt$x_label) +
