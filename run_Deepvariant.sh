@@ -26,8 +26,9 @@ usage='# Usage: run_Deepvariant.sh -b <Aligned, sorted, indexed BAM file> -r <re
 # [optional: -n <sample name (default BAM prefix)>]
 # [optional: -m <model (default to WGS)>]
 # [optional: -t <threads|4>]
-# [optional: -X <extra parameter string between quotes for the docker command 
-# (eg --dry_run to get a list of commands without running them)>]'
+# [optional: -X <extra parameter string <between single quotes!> for the docker command
+# (eg --dry_run to get a list of commands without actually running them)>]
+# (eg --regions chr20 to run only this one chromosome)'
 
 while getopts "b:r:n:m:t:X:h" opt; do
   case $opt in
@@ -40,7 +41,7 @@ while getopts "b:r:n:m:t:X:h" opt; do
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2;
        exit 1 ;;
-    *) echo "this command requires arguments, try -h" >&2; 
+    *) echo "this command requires arguments, try -h" >&2;
        exit 1 ;;
   esac
 done
