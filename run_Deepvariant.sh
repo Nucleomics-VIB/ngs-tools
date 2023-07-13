@@ -166,6 +166,18 @@ echo "# ${CMD}"
 echo
 eval ${CMD}
 
+#############################
+# fix charset in html report
+#############################
+
+# https://github.com/google/deepvariant/issues/643
+# add 'charset="UTF-8"' as shown below to line 9 of the html
+# <script type="text/javascript" charset="UTF-8" src="https://storage.googleapis.com/deepvariant/lib/vega/vega@5"></script>
+
+sed -i 's/<script type="text\/javascript" src="https:\/\/storage.googleapis.com\/deepvariant\/lib\/vega\/vega@5"><\/script>/\
+<script type="text\/javascript" charset="UTF-8" src="https:\/\/storage.googleapis.com\/deepvariant\/lib\/vega\/vega@5"><\/script>/' \
+${output_dir}/${pfx}.visual_report.html
+
 exit 0
 
 ######################################################

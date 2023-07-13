@@ -23,13 +23,15 @@ version="1.0, 2023_06_15"
 
 usage='# Usage: run_Hap_py.sh -v <VCF calls> -g <VCF reference (goldstandard)> -r <FASTA reference>
 # script version '${version}'
+# [optional: -n <outfolder name|prefix of VCF-calls>]
 # [optional: -t <threads|4>]'
 
-while getopts "v:g:r:t:h" opt; do
+while getopts "v:g:r:n:t:h" opt; do
   case $opt in
     v) opt_calls=${OPTARG} ;;
     g) opt_gold=${OPTARG} ;;
     r) opt_ref=${OPTARG} ;;
+    n) opt_name=${OPTARG} ;;
     t) opt_thr=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2;
@@ -106,19 +108,18 @@ fi
 
 reffile=$(basename ${opt_ref})
 
-
 # get file prefix and sample_name
 pfx=$(basename ${opt_calls%.vcf})
 
 workdir=$PWD
 
-out_pfx="happy_${pfx}_results"
-input_dir="${workdir}/${out_pfx}/input"
-output_dir="${workdir}/${out_pfx}"
+outfolder=${opt_name:-"happy_${pfx}_results"}
+input_dir="${workdir}/${outfolder}/input"
+output_dir="${workdir}/${outfolder}"
 
 # create local folders for inputs and results
 # docker does not work with non-local paths
-mkdir -p ${workdir}/${out_pfx}/{input,logs}
+mkdir -p ${workdir}/${outfolder}/{input,logs}
 
 #############################################
 # copy reference and mappings               #
@@ -154,29 +155,29 @@ engine="vcfeval"
 filter="--pass-only"
 
 echo "# running Deepvariant with docker command:"
-echo ${reffile}
+
 IFS='' read -r -d '' CMD <<EOF
 time docker run \
   --rm \
   -it \
   -u "$(id -u):$(id -g)" \
-  -v "${INPUT_DIR}":"/input" \
-  -v "${OUTPUT_DIR}:/output" \
+  -v "${input_dir}":"/input" \
+  -v "${output_dir}:/output" \
   ${img} \
   /opt/hap.py/bin/hap.py \
   /input/${goldfile} \
   /input/${callfile} \
-  -r "/input/${reffile}" \
-  -o "/output/happy.${pfx}.output" \
+  -r /input/${reffile} \
+  -o /output/happy.${pfx}.output \
   --engine=${engine} \
   --threads ${nthr} \
-  --logfile "/output/logs/happy.${pfx}.output" \
-  ${filter}
+  --logfile /output/logs/happy.${pfx}.output \
+  ${filter} 
 EOF
 
 echo "# ${CMD}"
 echo
-#eval ${CMD}
+eval ${CMD} > ${output_dir}/happy.${pfx}.output.txt 2>&1 
 
 exit 0
 
