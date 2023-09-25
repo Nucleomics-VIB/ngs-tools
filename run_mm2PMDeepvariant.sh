@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# script: run_bwaPMDeepvariant.sh
+# script: run_mm2PMDeepvariant.sh
 # call variants from long reads and a reference
 # using PEPPER Margin Deepvariant
 #
@@ -22,7 +22,7 @@
 # version number
 version="1.0, 2022_06_01"
 
-usage='# Usage: run_bwaPMDeepvariant.sh -f <fastq reads> -r <fasta reference>
+usage='# Usage: run_mm2PMDeepvariant.sh -f <fastq reads> -r <fasta reference>
 # script version '${version}'
 # [optional: -n <sample name|sample>]
 # [optional: -t <threads|4>]
