@@ -10,7 +10,7 @@
 
 version="1.0"
 
-usage='# Usage: merge2multiVCF.sh -i <folder with vcf files> -c <chromosome>
+usage="# Usage: merge2multiVCF.sh -i <folder with vcf files> -c <chromosome>
 # script version '${version}'
 # [optional: -o <output file|default to ${chr}.vcf.gz>]
 # [optional: -n <threads|1>]'
@@ -45,7 +45,7 @@ done
 
 # Check if the required arguments are provided
 if [[ -z "$infolder" || -z "$chr" ]]; then
-  echo ${usage}
+  echo "${usage}"
   exit 1
 fi
 
