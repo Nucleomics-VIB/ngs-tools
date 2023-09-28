@@ -8,7 +8,14 @@
 # Stephane Plaisance (VIB-NC) 2023/09/28; v1.0
 # visit our Git: https://github.com/Nucleomics-VIB
 
-while getopts ":i:c:o:n:" opt; do
+version="1.0"
+
+usage='# Usage: merge2multiVCF.sh -i <folder with vcf files> -c <chromosome>
+# script version '${version}'
+# [optional: -o <output file|default to ${chr}.vcf.gz>]
+# [optional: -n <threads|1>]'
+
+while getopts ":i:c:o:n:h" opt; do
   case $opt in
     i)
       infolder="$OPTARG"
@@ -22,6 +29,9 @@ while getopts ":i:c:o:n:" opt; do
     n)
       nthr="$OPTARG"
       ;;
+    h) 
+      echo "${usage}" >&2; exit 0
+      ;;  
     \?)
       echo "Invalid option: -$OPTARG" >&2
       exit 1
@@ -35,9 +45,7 @@ done
 
 # Check if the required arguments are provided
 if [[ -z "$infolder" || -z "$chr" ]]; then
-  echo "Usage: $0 -i infolder -c chr 
-  optional: -o output_vcf
-  optional: -n nthr"
+  echo ${usage}
   exit 1
 fi
 
