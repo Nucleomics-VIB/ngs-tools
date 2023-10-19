@@ -5,11 +5,11 @@
 #include <zlib.h>
 
 // source code: replace_quality_scores_gt.cpp 
-// SP@NC, 2023-10-19, version 1.0
+// SP@NC, 2023-10-19, version 1.5
 // read from a fastq (text or gzipped)
 // write to a .fq or .fq.gz depending on the presence of -z
 // replace all base quality scores greater than value given by -m with that value
-// compile me with: g++ replace_quality_scores_gt replace_quality_scores_gt.cpp -lz
+// compile me with: g++ -o replace_quality_scores_gt replace_quality_scores_gt.cpp -lz
 
 int main(int argc, char* argv[]) {
     int maxQualityScore = 0;
@@ -36,8 +36,8 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (inputFilename == nullptr || outputFilename == nullptr || maxQualityScore <= 0 || maxQualityScore > 94) {
-        std::cerr << "Usage: " << argv[0] << " -i <input.fastq.gz> -o <output_prefix> -m <max_quality_score> [-z]" << std::endl;
+    if (inputFilename == nullptr || maxQualityScore <= 0 || maxQualityScore > 94) {
+        std::cerr << "Usage: " << argv[0] << " -i <input.fastq.gz> -o <output_prefix (- for stdout)> -m <max_quality_score> [-z]" << std::endl;
         return 1;
     }
 
@@ -50,16 +50,20 @@ int main(int argc, char* argv[]) {
     gzFile gzOutput = nullptr;
     FILE* output = nullptr;
 
-    if (gzipOutput) {
-        std::string outputFileName(outputFilename);
-        outputFileName += ".fq.gz";  // Append .gz to the output file name
-        gzOutput = gzopen(outputFileName.c_str(), "wb");
-    } else {
-        std::string outputFileName(outputFilename);
-        if (outputFileName.rfind(".fq", outputFileName.length() - 3)) {
-            outputFileName += ".fq";  // Append .fq to the output file name
+    if (outputFilename != nullptr) {
+        if (std::string(outputFilename) == "-") {
+            output = stdout;
+        } else if (gzipOutput) {
+            std::string outputFileName(outputFilename);
+            outputFileName += ".fq.gz";  // Append .gz to the output file name
+            gzOutput = gzopen(outputFileName.c_str(), "wb");
+        } else {
+            std::string outputFileName(outputFilename);
+            if (outputFileName.rfind(".fq", outputFileName.length() - 3)) {
+                outputFileName += ".fq";  // Append .fq to the output file name
+            }
+            output = fopen(outputFileName.c_str(), "w");
         }
-        output = fopen(outputFileName.c_str(), "w");
     }
 
     if (input == NULL) {
@@ -68,7 +72,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (output == NULL && gzOutput == NULL) {
-        std::cerr << "Error: Could not open output file: " << outputFilename << std::endl;
+        std::cerr << "Error: Could not open output file: " << (outputFilename != nullptr ? outputFilename : "stdout") << std::endl;
         return 1;
     }
 
@@ -95,7 +99,7 @@ int main(int argc, char* argv[]) {
     gzclose(input);
     if (gzOutput) {
         gzclose(gzOutput);
-    } else {
+    } else if (outputFilename != nullptr && std::string(outputFilename) != "-") {
         fclose(output);
     }
 
