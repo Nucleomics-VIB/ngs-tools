@@ -7,7 +7,7 @@
 // source code: replace_quality_scores_gt.cpp 
 // SP@NC, 2023-10-19, version 1.5
 // read from a fastq (text or gzipped)
-// write to a .fq or .fq.gz depending on the presence of -z
+// write to stdout (-o -), or to a .fq or a .fq.gz depending on the presence of -z
 // replace all base quality scores greater than value given by -m with that value
 // compile me with: g++ -o replace_quality_scores_gt replace_quality_scores_gt.cpp -lz
 
