@@ -8,24 +8,31 @@
 # small edits, 2016-03-13 v1.1
 # small edits, 2019-06-25 v1.2
 # small edits, 2020-02-28 v1.3
+# small edits, 2023-11-03 v1.4
 
-version="1.3, 2020_02_28"
+version="1.4, 2023_11_03"
 
 usage='# Usage: StarBuildRef.sh
 # -i <reference.fasta>
 # -g <matching gtf file>
 # -l <read length (default: 75)>
 # -o <STAR-indices root folder (if $STAR_INDEXES is not defined)>
-# -t <title for this new STAR-indices folder (or defined from inputs)
+# -T <title for this new STAR-indices folder (or defined from inputs)
+# -m <memory (default: 64G)>
+# -t <threads (default: 8)>
 # -h <this help text>
 # script version '${version}
 
-while getopts "o:i:g:l:t:h" opt; do
+# Default values
+mram="64G"
+thr=8
+
+while getopts "o:i:g:l:T:m:t:h" opt; do
   case $opt in
     o)
       outdir=${OPTARG}
       ;;
-    t)
+    T)
       outfolder=${OPTARG}
       ;;
     i)
@@ -36,6 +43,12 @@ while getopts "o:i:g:l:t:h" opt; do
       ;;
     l)
       readlen=${OPTARG:-75}
+      ;;
+    m)
+      mram=${OPTARG:-64G}
+      ;;
+    t)
+      thr=${OPTARG:-8}
       ;;
     h)
       echo "${usage}" >&2
@@ -52,12 +65,6 @@ while getopts "o:i:g:l:t:h" opt; do
       ;;
   esac
 done
-
-############# EDIT HERE ############
-# hardware limits
-thr=8
-mram="64G"
-##########STOP EDITING HERE ########
 
 # variables
 star_folder=${outdir:-"$STAR_INDEXES"}
