@@ -3,9 +3,9 @@
 # script: blast_assembly2NT.sh
 # Compare denovo assembly contigs/scaffolds to NCBI NT
 # find major match for each contig and report hit counts
-# add acc title and taxonomy info to identify/document each contig
+# add acc title, tlen, aliw and taxonomy info to identify/document each contig
 #
-# SP@NC 2024-01-29; v1.0
+# SP@NC 2024-01-29; v1.01
 
 # custom function to activate a conda env present on the server
 activate_conda_env() {
@@ -57,13 +57,28 @@ blastn \
   -out ${outfolder}/${pfx}_blastn.txt \
   2> ${outfolder}/logs/${pfx}_blastn_log.txt
 
- sort the list and count
+# sort the list and count
 cut -f 1,2 ${outfolder}/${pfx}_blastn.txt \
   | grep -v "^#" \
   | uniq \
   > ${outfolder}/${pfx}_blast_counts.txt
 
 conda deactivate
+
+#################################
+# compute target alignment width
+#################################
+
+blast2targetwidth.py ${outfolder}/${pfx}_blast_counts.txt \
+  > ${outfolder}/${pfx}_blastn_targetwidth.txt
+
+# put results into an array for later retrieval
+declare -A acc2aliw
+
+while IFS=$'\t' read -r -a myArray
+do
+  acc2aliw["${myArray[0]}"]="${myArray[1]}"
+done < ${outfolder}/${pfx}_blastn_targetwidth.txt
 
 #######################
 # identify blastn hits
@@ -81,34 +96,80 @@ cut -f 2 ${outfolder}/${pfx}_blast_counts.txt \
 efetch -input ${outfolder}/${pfx}_acc_list.txt \
   -db nucleotide \
   -format docsum \
-  | xtract -pattern DocumentSummary -element AccessionVersion,Title,Organism \
+  | xtract -pattern DocumentSummary -element AccessionVersion,Title,Slen,Organism \
   > ${outfolder}/${pfx}_acc2info.txt
 
 # fill arrays for retreival
 declare -A acc2title
+declare -A acc2len
 declare -A acc2tax
 
 while IFS=$'\t' read -r -a myArray
 do
   acc2title["${myArray[0]}"]="${myArray[1]}"
-  acc2tax["${myArray[0]}"]="${myArray[2]}"
+  acc2len["${myArray[0]}"]="${myArray[2]}"
+  acc2tax["${myArray[0]}"]="${myArray[3]}"
 done < ${outfolder}/${pfx}_acc2info.txt
 
-# parse original blast results and add columns
-while read ctg id; do
+##########################################
+# add coverage and %coverage for each Acc
+##########################################
 
-title=${acc2title["${id}"]:-"na"}
-chrom="$(echo ${title} | sed -r 's/.*chromosome[^0-9]*([0-9]+).*/\1/')"
-taxonomy=${acc2tax["${id}"]:-"na"}
+while IFS=$'\t' read -r id 
+do
 
-# Check if the chrom is an integer
-if [[ $chrom =~ ^-?[0-9]+$ ]]; then
+  title=${acc2title["${id}"]:-"na"}
+  chrom="$(echo ${title} | sed -r 's/.*chromosome[^0-9]*([0-9]+).*/\1/')"
+  tlen=${acc2len["${id}"]:-"na"}
+  aliw=${acc2aliw["${id}"]:-"na"}
+  taxonomy=${acc2tax["${id}"]:-"na"}
+
+  # Check if the chrom is an integer
+  if [[ $chrom =~ ^-?[0-9]+$ ]]; then
     chr=${chrom}
-else
+  else
    chr="na"
-fi
+  fi
 
-printf "%s\t%s\t%s\t%s\t%s\n" "${ctg}" "${id}" "${title}" "chr_${chr}" "${taxonomy}"
+  # compute % covered
+  printf -v result "%.3f" "$(bc -l <<< "${aliw}*100/${tlen}")"
+  if (( $(echo "$result < 1" | bc -l) )); then
+    perc=$(printf "%.2f" "$result")
+  else
+    perc=$(printf "%.1f" "$result")
+  fi
+
+  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n" "${id}" "${title}" "chr_${chr}" "${tlen}" "${aliw}" "${perc}" "${taxonomy}"
+
+done < ${outfolder}/${pfx}_acc_list.txt > ${outfolder}/${pfx}_acc_info.txt
+
+#####################################
+# parse blast counts and add columns
+#####################################
+
+# NOTE that "${aliw}" "${perc}" refer globally to the target accession 
+# and not to that contig vs id alignment
+
+while IFS=$'\t' read ctg id
+do
+
+  title=${acc2title["${id}"]:-"na"}
+  chrom="$(echo ${title} | sed -r 's/.*chromosome[^0-9]*([0-9]+).*/\1/')"
+  tlen=${acc2len["${id}"]:-"na"}
+  aliw=${acc2aliw["${id}"]:-"na"}
+  taxonomy=${acc2tax["${id}"]:-"na"}
+  
+  # Check if the chrom is an integer
+  if [[ $chrom =~ ^-?[0-9]+$ ]]; then
+      chr=${chrom}
+  else
+     chr="na"
+  fi
+  
+  # compute % covered
+  perc=$(echo "scale=1; ${aliw}*100/${tlen}" | bc)
+  
+  printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" "${ctg}" "${id}" "${title}" "chr_${chr}" "${tlen}" "${aliw}" "${perc}" "${taxonomy}"
 
 done < ${outfolder}/${pfx}_blast_counts.txt \
   > ${outfolder}/${pfx}_blast_summary.txt
@@ -120,7 +181,7 @@ conda deactivate
 ####################################################
 
 # sort decreasing and keep first as candidate
-tophit=( $(cut -f 5 ${outfolder}/${pfx}_blast_summary.txt \
+tophit=( $(cut -f 7 ${outfolder}/${pfx}_blast_summary.txt \
   | sort \
   | uniq -c \
   | sort -k1,1nr \
