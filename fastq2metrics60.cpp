@@ -7,7 +7,7 @@
 // with plot_read_metrics.R -i fastq_metrics_file
 // SP@NC; 2024_01_05 (+GPT)
 //
-// script: fastq2metrics.cpp
+// script: fastq2metrics60.cpp
 // compile with: g++ -o fastq2metrics60 fastq2metrics60.cpp
 
 // Function to directly subtract 33 from ASCII value
