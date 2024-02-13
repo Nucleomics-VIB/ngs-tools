@@ -46,7 +46,7 @@ null <- dev.off()
 })
 
 # cumulative plot
-#suppressWarnings({
+suppressWarnings({
 pdf("N_plot.pdf", width=6, height=6)
 ggplot(data=seq_df, aes(x=idx, y=cum, group=1)) +
   geom_line(col="grey70")+
@@ -59,4 +59,4 @@ ggplot(data=seq_df, aes(x=idx, y=cum, group=1)) +
   ylab("assembly size")+
   scale_y_continuous(labels = unit_format(unit = "e+06", scale = 1 / 1e+06, digits = 2))
 null <- dev.off()
-#})
+})
