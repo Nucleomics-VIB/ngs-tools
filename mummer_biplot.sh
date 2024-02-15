@@ -6,6 +6,8 @@
 # run on a unix computer installed with mummer3+ (mummer apps in $PATH)
 # two related fasta references to be compared
 #
+# use instead asm2dotplot.sh + pafCoordsDotPlotly_SP.R (much faster)
+#
 # Stephane Plaisance (VIB-NC+BITS) 2017/09/22; v1.0
 #
 # visit our Git: https://github.com/Nucleomics-VIB

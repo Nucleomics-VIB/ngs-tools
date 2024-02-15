@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
 
+# code to plot paf results in asm2dotplot.sh
 # light revision of the dotPlotly script pafCoordsDotPlotly.R
 # from https://github.com/tpoorten/dotPlotly (thanks for the great code)
 # * leave path before file name
