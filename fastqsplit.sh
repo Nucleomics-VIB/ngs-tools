@@ -2,7 +2,7 @@
 
 # script: fastqsplit.sh
 # SP@NC 2024-02-15, v1.0
-# depends on fastqsplit (https://github.com/LUMC/fastqsplitter)
+# depends on fastqsplitter (https://github.com/LUMC/fastqsplitter)
 
 myenv=fastqsplitter
 source /etc/profile.d/conda.sh
