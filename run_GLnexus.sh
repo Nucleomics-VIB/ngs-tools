@@ -122,7 +122,7 @@ outfile="merged.vcf.gz"
   | bgzip -@ 4 -c \
   > ${outfolder}/${outfile} && \
   tabix -p vcf ${outfolder}/${outfile}; } \
-  | tee ${outfolder}/${outfile%.vcf.gz}_glnexus_log.txt
+  |& tee ${outfolder}/${outfile%.vcf.gz}_glnexus_log.txt
 
 exit 0
 
