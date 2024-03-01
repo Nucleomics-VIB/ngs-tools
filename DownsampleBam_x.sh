@@ -1,32 +1,43 @@
 #!/usr/bin/bash
 
-# script: DownsampleSam_x.sh
+# script: DownsampleBam_x.sh
 # picard Downsample mappings for benchmarking
 # SP@NC; 2023-06-19; v1.0
 
-version="1.1, 2023-06-19"
+version="1.2, 2024-03-01"
 
-usage='# Usage: downsample_x.sh
-#    -b <input BAM file>
-#    -p <percent data to retain (integer number eg. 70 => 70%)>
-# optional
-#    -s seed <default to 1>
-#    -a accuracy <default to 0.001>
-#    -S Strategy <default to "ConstantMemory">
-# version: '${version}
+usage='# Usage: $0
+  -b <input BAM file>
+  -p <percent data to retain (integer number eg. 70 => 70%)>
+optional
+  -o output file name (without .bam)
+  -s seed <default to 1>
+  -a accuracy <default to 0.001>
+  -S Strategy <default to ConstantMemory>
+version: '${version}
 
 # Parse command-line options
-while getopts "b:p:s:a:S:" opt; do
+if [ $# -eq 0 ]; then
+  echo "${usage}"
+  exit 1
+fi
+
+# Parse command-line options
+while getopts "b:p:s:a:S:o:h" opt; do
   case $opt in
     b) opt_bam=$OPTARG ;;
     p) opt_pc=$OPTARG ;;
+    o) opt_out=$OPTARG ;;
     s) opt_seed=$OPTARG ;;
     a) opt_acc=$OPTARG ;;
     S) opt_str=$OPTARG ;;
+    h) echo "${usage}"
+       exit 0
+       ;;
     \?)
-      echo "Invalid option: -$OPTARG" >&2
-      exit 1
-      ;;
+       echo -e "${usage}"
+       exit 1
+       ;;
   esac
 done
 
@@ -42,7 +53,8 @@ if [ -z "$opt_pc" ]; then
 fi
 
 # variables
-outbam=${opt_bam%.bam}_${opt_pc}pc_ds.bam
+outbamdef=${opt_bam%.bam}_${opt_pc}
+outbam=${opt_out:-${outbamdef}}.bam
 percent=$(echo "scale=2; ${opt_pc}/100" | bc)
 
 # seed and default settings
@@ -65,7 +77,7 @@ java -jar $PICARD/picard.jar DownsampleSam \
   --VALIDATION_STRINGENCY LENIENT \
   --VERBOSITY INFO \
   --TMP_DIR tmpdir \
-  > "${opt_bam%.bam}_${opt_pc}pc_downsampling_log.txt" 2>&1
+  | tee "${opt_bam%.bam}_${opt_pc}pc_downsampling_log.txt"
 
 # show summary
 echo "# summary"
