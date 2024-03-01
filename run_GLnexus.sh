@@ -68,6 +68,7 @@ ram=${opt_mem:-16}
 
 # set in and out folders
 infolder=${opt_gvcfdir}
+# docker needs full-path for -v mapping !!!
 outfolder=$(realpath ${opt_outdir})
 
 # prepare analysis, the docker image can only access local files
@@ -90,7 +91,7 @@ fi
 # merge gVCF using glnexus
 ###########################
 
-# create a space delimited list of inputs
+# create a space delimited list of inputs with docker path
 gvcflist=$(find ${outfolder} -type f -name "*.g.vcf.gz" \
            | tr " " "\n" \
            | sort -k 1V,1 \
@@ -98,7 +99,7 @@ gvcflist=$(find ${outfolder} -type f -name "*.g.vcf.gz" \
            | gawk -v p="/data/" '{printf "%s%s ",p, $1}' \
            | tr -d "\n")
 
-# bcftools reheader -s sample_names.txt -o reordered.vcf merged.vcf
+# also create sorted list of samples for the VCF header
 find ${outfolder} -type f -name "*.g.vcf.gz" -exec basename {} \; \
            | sort -k 1V,1 \
            > ${outfolder}/sample_order.txt
