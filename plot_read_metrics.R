@@ -1,15 +1,14 @@
 #!/usr/bin/Rscript
 
 # Plot from FastQ (ONT or PacBIO)
-# usage: plot_read_metrics.R -i fastq_metrics file
+# usage: plot_read_metrics.R -i fastq_metrics.txt file
 #
 # Stephane Plaisance VIB-NC November-21-2023 v1.0
-# depends on bioawk for read metrics extraction
-# with a command like: fastq2metrics (custum function)
-# bioawk -c fastx 'BEGIN{OFS="\t"; print "readid\tmeanq\tlength\tgc"}{print $name,meanqual($qual),length($seq),gc($seq)}' $fastq > metrics.txt
+# depends on external command for read metrics extraction
+# eg: zcat ${fastq}.gz | fastq2metrics > fastq_metrics.txt
 
 # R libraries
-suppressMessages(library("optparse"))
+suppressMessages(library("optparse")
 suppressMessages(library("readr"))
 suppressMessages(library("plyr"))
 suppressMessages(library("ggplot2"))
