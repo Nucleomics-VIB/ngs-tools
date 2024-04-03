@@ -112,12 +112,15 @@ result="${outpath}/${prog}-plot-${ylabel%.f*}_vs_${xlabel%.f*}"
 # build the command
 stamp=$(date +%s)
 
+# logfile
+logfile=${outpath}/${ylabel}_vs_${xlabel}_mummer3-log_${stamp}.txt
+
 cmd="${prog} --maxmatch \
 	-c ${cluster} \
 	-p ${result} \
 	${multi} \
 	${assembly1} ${assembly2}
-	> ${ylabel}_vs_${xlabel}_mummer3-log_${stamp}.txt 2>&1"
+	> ${logfile} 2>&1"
 
 # show and execute	
 echo "# ${cmd}"
@@ -129,12 +132,12 @@ if [ $? -eq 0 ]; then
 		show-coords -r -c -l -I ${minidentity} -L ${minalign} ${result}.delta \
 		> ${result}${coordfilter}_coords.txt && \
 		mummerplot --fat --filter --layout --${outformat} --large -p ${result} ${result}.delta) \
-		>> ${ylabel}_vs_${xlabel}_mummer3-log_${stamp}.txt 2>&1"
+		>> ${logfile} 2>&1"
 
 	echo "# ${cmd}"
 	eval ${cmd}
 else
-	echo "Mummer analysis seems to have failed, please check ${ylabel}_vs_${xlabel}_mummer3-log_${stamp}.txt!"
+	echo "Mummer analysis seems to have failed, please check ${logfile}!"
 fi
 
 exit 0
