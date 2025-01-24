@@ -4,7 +4,7 @@
 fastq2motif.py
 
 Created on: January 23, 2025
-Version: 2.7
+Version: 2.8
 Author: SP@NC + AI Assistant
 
 Description:
@@ -44,7 +44,7 @@ def compute_motif(fastq_file, motif_length, sample_size):
     
     return consensus, motif_counts
 
-def create_logo(motif_counts, file_prefix):
+def create_logo(motif_counts, file_prefix, consensus):
     # Create a DataFrame with the correct structure for logomaker
     df = pd.DataFrame({
         base: [counts.get(base, 0) for counts in motif_counts]
@@ -72,7 +72,7 @@ def create_logo(motif_counts, file_prefix):
     # Add labels and title
     ax.set_xlabel('Position')
     ax.set_ylabel('Probability')
-    ax.set_title(f"DNA Motif Logo - {file_prefix}")
+    ax.set_title(f"DNA Motif Logo - {file_prefix}\nConsensus: {consensus}")
     
     # Save the logo
     plt.savefig("motif_logo.png", dpi=300, bbox_inches='tight')
@@ -114,5 +114,5 @@ if __name__ == "__main__":
     for i, counts in enumerate(motif_counts, 1):
         print(f"Position {i}: {dict(counts)}")
 
-    create_logo(motif_counts, file_prefix)
+    create_logo(motif_counts, file_prefix, consensus)
     print("\nMotif logo saved as 'motif_logo.png'")
