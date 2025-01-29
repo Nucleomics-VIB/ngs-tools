@@ -8,9 +8,10 @@ Version: 2.8
 Author: SP@NC + AI Assistant
 
 Description:
-This script computes the DNA motif from the first <l (default 20)> bases of <s (default 1000)> reads in a FASTQ or FASTQ.gz file.
-It processes the specified number of reads, outputs the consensus sequence and count matrix, generates a sequence logo,
-and saves the motif matrix in MEME format.
+This script computes the DNA motif from the first <l (default 20)> bases 
+of the first <s (default 1000)> reads in a FASTQ or FASTQ.gz file.
+The code outputs the consensus sequence and count matrix, 
+generates a sequence logo png file, and exports the motif matrix in MEME format.
 
 Usage:
 python fastq2motif.py -i <input_fastq> [-l <length (20)>] [-s <sample_size (1000)>]
