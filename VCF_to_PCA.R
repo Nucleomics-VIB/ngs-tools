@@ -12,9 +12,9 @@
 #   Rscript VCF_to_PCA.R -i input.vcf.gz -o /path/to/output/
 #   Rscript VCF_to_PCA.R -i input.vcf.gz -o /path/to/output/ -f pdf
 #
-# Author: [Your Name]
+# Author: SP@NC (+AI)
 # Date: 2025-02-25
-# Version: 1.4
+# Version: 1.0
 
 # Function to check and load required libraries
 check_and_load_libraries <- function() {
