@@ -3,7 +3,7 @@
 ## phylip-tree_to_COR.R
 #
 # This script reads a phylogenetic tree file, computes pairwise distances,
-# and generates a correlation heatmap.
+# and generates a correlation heatmap with clustered samples.
 #
 # Usage:
 #   Rscript phylip-tree_to_COR.R -i <input_tree_file> -o <output_directory> [-f <output_format>]
@@ -14,11 +14,11 @@
 #
 # Author: SP@NC (+AI)
 # Date: 2025-02-25
-# Version: 1.0
+# Version: 1.1
 
 # Function to check and load required libraries
 check_and_load_libraries <- function() {
-  required_packages <- c("ape", "ggplot2", "reshape2", "optparse")
+  required_packages <- c("ape", "pheatmap", "optparse")
   
   for (package in required_packages) {
     if (!requireNamespace(package, quietly = TRUE)) {
@@ -28,8 +28,7 @@ check_and_load_libraries <- function() {
   
   # Load the libraries
   library(ape)
-  library(ggplot2)
-  library(reshape2)
+  library(pheatmap)
   library(optparse)
 }
 
@@ -80,20 +79,21 @@ main <- function(input_file, output_dir, output_format) {
   # Compute pairwise distances
   distances <- cophenetic(tree)
   
-  # Convert distance matrix to long format for plotting
-  cor_data <- melt(distances)
-  
-  # Create correlation heatmap
-  plot <- ggplot(cor_data, aes(Var1, Var2, fill = value)) +
-    geom_tile() +
-    scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0) +
-    theme_minimal() +
-    labs(title = "Pairwise Distances", x = "Sample", y = "Sample") +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-  
-  # Save the plot
+  # Create and save the heatmap
   output_file <- file.path(output_dir, paste0("correlation_heatmap.", output_format))
-  ggsave(output_file, plot = plot, width = 12, height = 10, dpi = 300)
+  
+  pheatmap(distances, 
+           clustering_distance_rows = as.dist(distances),
+           clustering_distance_cols = as.dist(distances),
+           main = "Pairwise Distances",
+           show_rownames = TRUE,
+           show_colnames = TRUE,
+           fontsize_row = 8,
+           fontsize_col = 8,
+           color = colorRampPalette(c("blue", "white", "red"))(100),
+           filename = output_file,
+           width = 12,
+           height = 10)
   
   cat("Correlation heatmap saved as:", output_file, "\n")
 }
