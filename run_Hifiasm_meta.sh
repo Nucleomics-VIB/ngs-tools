@@ -18,8 +18,8 @@ usage() {
     echo "  -f DIR      FASTQ input/output directory (default: fastq_data)"
     echo "  -o DIR      assembly output directory (default: asm_results)"
     echo "  -n INT      threads for bam2fastq (default: 4)"
-    echo "  -j INT      max concurrent jobs (default: 2)"
-    echo "  -t INT      threads per hifiasm_meta (default: 16)"
+    echo "  -j INT      max concurrent jobs (default: 4)"
+    echo "  -t INT      threads per hifiasm_meta (default: 20)"
     echo " version ${version}"
     exit 1
 }
@@ -30,8 +30,8 @@ inbam="bam_data"
 infastq="fastq_data"
 outasm="asm_results"
 n=4
-j=3
-t=24
+j=4
+t=20
 
 # Parse command-line options
 while getopts ":qb:f:o:n:j:t:h" opt; do
@@ -69,13 +69,14 @@ else
 fi
 
 echo "Starting pipeline. Logs will be saved in ${log_dir}."
-mkdir -p "${outasm}"
 
 process_bam() {
     local bam="$1"
     local pfx=$(basename "${bam}" .bam)
     local fastq_flag="${infastq}/${pfx}.fastq.gz.ok"
     local log_file="${log_dir}/${pfx}_processing.log"
+
+    mkdir -p "${infastq}"
 
     echo "Processing ${pfx} - Log: ${log_file}"
     echo "Starting processing of ${pfx} at $(date)" > "${log_file}"
@@ -87,7 +88,9 @@ process_bam() {
         echo "Converting ${pfx} to FASTQ..." | tee -a "${log_file}"
         local conv_start=$(date +%s)
         
-        bam2fastq -j "${n}" "${bam}" -o "${infastq}/${pfx}" 2>> "${log_file}"
+        local cmd="bam2fastq -j ${n} ${bam} -o ${infastq}/${pfx}"
+        echo "Executing command: ${cmd}" | tee -a "${log_file}"
+        eval ${cmd} 2>> "${log_file}"
         local exit_status=$?
         local conv_end=$(date +%s)
         local conv_duration=$((conv_end - conv_start))
@@ -131,7 +134,9 @@ assemble_fastq() {
             mkdir -p "${asm_dir}"
             local asm_start=$(date +%s)
             
-            hifiasm_meta -t "${t}" -o "${asm_dir}/${pfx}" "${infastq}/${pfx}.fastq.gz" 2>> "${log_file}"
+            local cmd="hifiasm_meta -t ${t} -o ${asm_dir}/${pfx} ${infastq}/${pfx}.fastq.gz"
+            echo "Executing command: ${cmd}" | tee -a "${log_file}"
+            eval ${cmd} 2>> "${log_file}"
             local exit_status=$?
             local asm_end=$(date +%s)
             local asm_duration=$((asm_end - asm_start))
@@ -162,15 +167,17 @@ if [[ "$start_from_fastq" == true ]]; then
     export infastq outasm t log_dir
 
     echo "Starting assembly from FASTQ files with ${j} concurrent jobs..."
-    find "${infastq}" -name "*.fastq.gz" -print0 | \
-        parallel -0 -j "${j}" process_fastq {}
+    cmd="find ${infastq} -name '*.fastq.gz' -print0 | parallel -0 -j ${j} process_fastq {}"
+    echo "Executing command: ${cmd}" | tee -a "${log_dir}/main_execution.log"
+    eval ${cmd}
 else
     export -f process_bam assemble_fastq
     export infastq outasm n t log_dir
 
     echo "Starting BAM processing with ${j} concurrent jobs..."
-    find "${inbam}" -name "*.bam" -print0 | \
-        parallel -0 -j "${j}" process_bam {}
+    cmd="find ${inbam} -name '*.bam' -print0 | parallel -0 -j ${j} process_bam {}"
+    echo "Executing command: ${cmd}" | tee -a "${log_dir}/main_execution.log"
+    eval ${cmd}
 fi
 
 echo "Pipeline completed. Logs saved in: ${log_dir}"
