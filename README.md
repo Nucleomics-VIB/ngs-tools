@@ -396,4 +396,10 @@ The python script **[fastq2motif.py](fastq2motif.py)** identifies motifs in fast
 # [optional: -h <this help text>]
 ```
 
-### **
+*[[back-to-top](#top)]*  
+
+<hr>
+
+<h4>Please send comments and feedback to <a href="mailto:nucleomics.bioinformatics@vib.be">nucleomics.bioinformatics@vib.be</a></h4>
+
+<hr>
