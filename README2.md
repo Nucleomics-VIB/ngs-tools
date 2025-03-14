@@ -141,7 +141,7 @@ The bash script **[makeENSref.sh](makeENSref.sh)** creates a series of reference
 
 ### **gepard_plot.sh**
 
-The bash script **[gepard_plot.sh](gepard_plot.sh)** creates a xy-plot from two related assemblies. The Java GUI tools do the same but this script is applicable to multiple inputs in batch.
+The bash script **[gepard_plot.sh](gepard_plot.sh)** creates a xy-plot from two related assemblies. The Java GUI tools does the same but this script is applicable to multiple inputs in batch. The original tool can be found at https://github.com/univieCUBE/gepard.
 ```bash
 # Usage: gepard_plot.sh -x <reference assembly> -y <draft assembly> -p <path to gepard.jar and matrices>
 # script version 1.1, 2017_09_05
@@ -157,7 +157,7 @@ The bash script **[gepard_plot.sh](gepard_plot.sh)** creates a xy-plot from two 
 
 ### **mauve_reorder.sh**
 
-The bash script **[mauve_reorder.sh](mauve_reorder.sh)** reorders a draft-assembly based on a reference assembly at CLI. The Java GUI tools do the same but this script is applicable to multiple inputs in batch.
+The bash script **[mauve_reorder.sh](mauve_reorder.sh)** reorders a draft-assembly based on a reference assembly at CLI. The Java GUI tools does the same but this script is applicable to multiple inputs in batch. The original tool can be found at http://darlinglab.org/mauve/download.html
 ```bash
 # Usage: mauve_reorder.sh -i <draft assembly> -r <reference assembly> -p <mauve path>
 # script version 1.0, 2017_04_21
@@ -168,7 +168,9 @@ The bash script **[mauve_reorder.sh](mauve_reorder.sh)** reorders a draft-assemb
 
 ### **mappability.sh**
 
-The bash script **[mappability.sh](mappability.sh)** creates a mappability track for a given single-read length and a reference genome. Such tracks used to be present in IGV from the web server and are now created locally.
+The bash script **[mappability.sh](mappability.sh)** creates a mappability track for a given single-read length and a reference genome. Such tracks used to be present in IGV from the web server and have been removed. A mappability track allows you to identify those regions of the genome which are so ubiquitous that reads have no chance to map to them and explain why you may not observe coverage in these regions (Derrien et al., 2012). For more info about this data type, please look at our page http://wiki.bits.vib.be/index.php/Create_a_mappability_track. The script depends on a number of resources including the gem-libraries and several of Jim Kent's Utilities KentUtils.
+
+
 ```bash
 # Usage: mappability.sh
 # -i <reference assembly fasta>)> 
