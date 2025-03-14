@@ -8,6 +8,8 @@ Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/ngs-
 
 ## Fasta and Fastq Utilities
 
+*[[back-to-top](#top)]*  
+
 ### **fastastats.pl**
 
 The perl script **[fastastats.pl](fastastats.pl)** computes simple length statistics on a multi-fasta file.
@@ -99,6 +101,8 @@ The bash script **[fastp_benchmark.sh](fastp_benchmark.sh)** benchmarks fastp fo
 
 ## Assembly and Alignment
 
+*[[back-to-top](#top)]*  
+
 ### **run_Hifiasm_meta.sh**
 
 The bash script **[run_Hifiasm_meta.sh](run_Hifiasm_meta.sh)** processes PacBio HiFi data through conversion (if needed) and assembly.
@@ -183,6 +187,8 @@ The bash script **[mappability.sh](mappability.sh)** creates a mappability track
 
 ## Variant Calling and Analysis
 
+*[[back-to-top](#top)]*  
+
 ### **GATK_Variant_Analysis.sh**
 
 The bash script **[GATK_Variant_Analysis.sh](GATK_Variant_Analysis.sh)** performs variant analysis using GATK.
@@ -239,6 +245,8 @@ The bash script **[varscan2mpileup2trio.sh](varscan2mpileup2trio.sh)** calls tri
 ```
 
 ## Other Tools
+
+*[[back-to-top](#top)]*  
 
 ### **asm2cvg.sh**
 
