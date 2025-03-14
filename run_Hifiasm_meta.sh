@@ -33,6 +33,18 @@ n=4
 j=4
 t=20
 
+# Check if required tools are installed
+check_tools() {
+    for tool in bam2fastq hifiasm_meta parallel; do
+        if ! command -v $tool &> /dev/null; then
+            echo "ERROR: $tool is not installed. Please install it and try again."
+            exit 1
+        fi
+    done
+}
+
+check_tools
+
 # Parse command-line options
 while getopts ":qb:f:o:n:j:t:h" opt; do
     case $opt in
