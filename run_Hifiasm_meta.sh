@@ -30,8 +30,8 @@ inbam="bam_data"
 infastq="fastq_data"
 outasm="asm_results"
 n=4
-j=2
-t=16
+j=3
+t=24
 
 # Parse command-line options
 while getopts ":qb:f:o:n:j:t:h" opt; do
