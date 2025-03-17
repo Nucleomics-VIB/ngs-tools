@@ -61,8 +61,8 @@ while getopts ":qb:f:o:n:j:t:h" opt; do
     esac
 done
 
-# Create log directory
-log_dir="hifiasm_meta_logs_$(date +%Y%m%d_%H%M%S)"
+# Create log directory inside the assembly output folder
+log_dir="${outasm}/hifiasm_meta_logs_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "${log_dir}"
 
 # Check directories based on the starting point
