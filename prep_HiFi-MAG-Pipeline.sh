@@ -2,6 +2,7 @@
 
 # Title       : prep_HiFi-MAG-Pipeline.sh
 # Description : Prepare hifiasm_meta assembly and HiFi reads for the HiFi-MAG-Pipeline.
+# link:       : https://github.com/PacificBiosciences/pb-metagenomics-tools/blob/master/docs/Tutorial-HiFi-MAG-Pipeline.md
 # Author      : SP@NC (+AI)
 # Version     : 1.0; 2025-03-14
 
@@ -54,7 +55,7 @@ CONFIG_FILE="configs/Sample-Config.yaml"
 if [ ! -f "$CONFIG_FILE" ]; then
     echo "Creating new Sample-Config.yaml file..."
     mkdir -p configs
-    echo "samples:" > "$CONFIG_FILE"
+    echo "samplenames:" > "$CONFIG_FILE"
 fi
 
 # Check if the sample is already in the config file
@@ -66,6 +67,6 @@ else
 fi
 
 echo "Files successfully prepared:"
-echo "  Contigs: inputs/${SAMPLE_NAME}_contigs.fasta"
+echo "  Contigs: inputs/${SAMPLE_NAME}.contigs.fasta"
 echo "  Reads:   inputs/${SAMPLE_NAME}.fasta"
 echo "Sample-Config.yaml updated in configs/ directory."
