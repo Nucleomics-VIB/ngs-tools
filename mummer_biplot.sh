@@ -95,9 +95,9 @@ if [ ! -f "${assembly2}" ]; then
 fi
 
 # check if mummer requirements are present
-$( hash ${prog} 2>/dev/null ) || ( echo "# ${prog} not found in PATH (nucmer or promer?)"; exit 1 )
-$( hash show-coords 2>/dev/null ) || ( echo "# show-coords not found in PATH"; exit 1 )
-$( hash mummerplot 2>/dev/null ) || ( echo "# mummer-plot not found in PATH"; exit 1 )
+hash ${prog} 2>/dev/null || { echo "# ${prog} not found in PATH (nucmer or promer?)"; exit 1; }
+hash show-coords 2>/dev/null || { echo "# show-coords not found in PATH"; exit 1; }
+hash mummerplot 2>/dev/null || { echo "# mummer-plot not found in PATH"; exit 1; }
 
 # labels from filenames
 xlabel=$(basename ${assembly1%.f*})

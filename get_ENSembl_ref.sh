@@ -23,7 +23,7 @@ usage='# Usage: get_ENSembl_ref.sh -o <organism (homo_sapiens)>
 # check executables present (not checking Picard)
 declare -a arr=( "grep" "sed" "wget" "samtools")
 for prog in "${arr[@]}"; do
-$( hash ${prog} 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
+hash ${prog} 2>/dev/null || { echo "# required ${prog} not found in PATH"; exit 1; }
 done
 
 while getopts "o:p:b:t:h" opt; do

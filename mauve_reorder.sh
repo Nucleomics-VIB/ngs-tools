@@ -75,7 +75,7 @@ if [ ! -f "${mauvepath}/Mauve.jar" ]; then
 fi
 
 # check if requirements are present
-$( hash samtools 2>/dev/null ) || ( echo "# samtools not found in PATH"; exit 1 )
+hash samtools 2>/dev/null || { echo "# samtools not found in PATH"; exit 1; }
 
 # other parameters or defaults
 outname=$(basename ${draftassembly})
@@ -97,7 +97,7 @@ eval ${cmd}
  
 # after completion, copy the final ordered assembly to <destfolder> and index it
 if [ $? -eq 0 ]; then
-	lastfolder=$(basename $(find "${destfolder}" -type d -name "alignment*" | sort -k 1V,1r | head -1))
+  lastfolder="$(basename "$(find "${destfolder}" -type d -name "alignment*" | sort -k 1V,1r | head -1)")"
 	echo "#last iteration: ${lastfolder}"
 	cp ${destfolder}/${lastfolder}/${outname} \
   ${destfolder}/ordered-${outname} && \

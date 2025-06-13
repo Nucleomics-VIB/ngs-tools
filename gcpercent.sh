@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # script name: gcpercent.sh
 # create GC percent track for a given bin width
 # convert to TDF format for IGV
@@ -10,6 +11,8 @@
 # Stephane Plaisance (VIB-NC) 2018/12/03; v1.0
 #
 # visit our Git: https://github.com/Nucleomics-VIB
+
+set -e  # Exit on error
 
 version="1.0, 2018_12_03"
 
@@ -35,7 +38,7 @@ done
 # check executables present
 declare -a arr=( "bioawk" "bedtools" "igvtools" )
 for prog in "${arr[@]}"; do
-$( hash ${prog} 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
+  hash ${prog} 2>/dev/null || { echo "# required ${prog} not found in PATH"; exit 1; }
 done
 
 # declare variables

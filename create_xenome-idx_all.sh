@@ -3,7 +3,7 @@
 # script: create_xenome-idx_all.sh
 
 workdir=/data1/Xenome
-mkdir -p ${workdir} && cd ${workdir}
+mkdir -p ${workdir} && cd ${workdir} || exit
 
 # get the references from UCSC
 # requires razip for parallel compression

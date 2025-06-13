@@ -45,7 +45,7 @@ release=${optr:-88}
 baseurl=ftp://ftp.ensembl.org/pub/release-${release}/
 
 # create new folder
-mkdir -p ${build}.${release} && cd ${build}.${release}
+mkdir -p ${build}.${release} && cd ${build}.${release} || exit
 
 # get genome
 oriname=${organism^}.${build}.dna.primary_assembly.fa.gz
