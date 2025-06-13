@@ -75,7 +75,7 @@ fi
 # check if exists or die
 [ -f ${ref} ] || ( echo "## ERROR! ${ref} input not found" ; exit 1 )
 
-if [ -z "${bam_father}" || -z "${bam_mother}" || -z "${bam_child}"]
+if [ -z "${bam_father}" ] || [ -z "${bam_mother}" ] || [ -z "${bam_child}" ]
 then
    echo "# Three BAM files are required in order: Father Mother Child!"
    echo "${usage}"

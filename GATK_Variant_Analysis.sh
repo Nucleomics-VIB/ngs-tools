@@ -522,7 +522,7 @@ java ${javaopts} -jar $GATK/gatk.jar \
 	--filter "FS > 60.0" --filter-name "FS60" \
 	--filter "MQ < 40.0" --filter-name "MQ40" \
     --cluster-size 3 \
-    --cluster-window-size 10 \
+    --cluster-window-size 10
 
 # not applicable to chicken data
 #	--filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" \

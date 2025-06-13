@@ -47,7 +47,7 @@ done
 # check if executables are present
 declare -a arr=("samtools" "bwa" "bedtools" "btcvg2plots.R" "montage")
 for prog in "${arr[@]}"; do
-$( hash ${prog} 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
+eval $( hash "${prog}" 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
 done
 
 # test if minimal arguments were provided

@@ -42,6 +42,19 @@ then
    exit 1
 fi
 
+if [ ! -f "${ref}" ]; then
+	echo "${ref} file not found!"
+	exit 1
+fi
+
+# test if minimal arguments were provided
+if [ -z "${query}" ]
+then
+   echo "# no query provided!"
+   echo "${usage}"
+   exit 1
+fi
+
 if [ ! -f "${query}" ]; then
 	echo "${query} file not found!"
 	exit 1

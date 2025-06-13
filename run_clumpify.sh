@@ -30,18 +30,19 @@ usage='# Usage: run_clumpify.sh
 # -r <reads (fastq or gz archive)>
 # -p <opt: paired-reads (fastq or gz archive)>
 # -o <opt: <prefix>_summary.txt (default to basename of <reads>)>
+# -n <threads (all if not used)>
 # -T <one out of N|H|V (N=NextSeq, H=HiSeq3/4k, V=NovaSeq)>
-# -t <threads (all if not used)>
 # -w <opt: write deduplicated read set(s) (default to /dev/null)>
+# -t <opt: tmpdir (default to current directory)>
 # -h <this help text>
 # script version '${version}
 
-while getopts "r:p:o:t:T:wh" opt; do
+while getopts "r:p:o:n:T:w:th" opt; do
   case $opt in
     r) opt_reads=${OPTARG} ;;
     p) opt_paired=${OPTARG} ;;
     o) opt_prefix=${OPTARG} ;;
-    t) opt_threads=${OPTARG} ;;
+    n) opt_threads=${OPTARG} ;;
     T) opt_type=${OPTARG} ;;
     w) opt_write=1 ;;
     t) opt_tmp=${OPTARG} ;;

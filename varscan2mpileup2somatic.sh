@@ -37,7 +37,7 @@ while getopts "r:N:T:o:h" opt; do
   case $opt in
     r) ref=${OPTARG} ;;
     N) bam_normal=${OPTARG} ;;
-    Y) bam_tumour=${OPTARG} ;;
+    T) bam_tumour=${OPTARG} ;;
     o) opt_o=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
     \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
@@ -56,7 +56,12 @@ fi
 # check if exists or die
 [ -f ${ref} ] || ( echo "## ERROR! ${ref} input not found" ; exit 1 )
 
-if [ -z "${bam_normal}" || -z "${bam_tumour}"]
+if [ -z "${bam_normal}" ] || [ -z "${bam_tumour}" ]
+then
+   echo "# no BAM files provided!"
+   echo "${usage}"
+   exit 1
+fi
 then
    echo "# Two BAM files are required in order: Normal Tumour!"
    echo "${usage}"

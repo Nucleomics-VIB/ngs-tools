@@ -110,7 +110,7 @@ cmd="samtools view -H ${bam} \
 			--min-reads2 ${minread2} \
 			--min-avg-qual ${minavgq} \
 			--min-var-freq ${minvarf} \
-			--min-freq-for-hom ${minfhom}
+			--min-freq-for-hom ${minfhom} \
 			--p-value ${pval} \
 			--strand-filter ${strandfilter} \
 			> ${outdir}/\\\"{}\\\".vcf\""

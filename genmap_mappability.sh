@@ -130,7 +130,7 @@ echo "# plotting mappability on ${ref} for kmer:${kmer} and max ${err} errors"
 
 bedg=${outdir}/genmap_${ref}_${kmer}_${err}.bedgraph
 
-if [ -n ${optf} ]; then
+if [ -n "${optf}" ]; then
 echo "# counting only contigs starting by: ${optf}"
 filter="_${optf}"
 data=${outdir}/genmap_${ref}_${kmer}_${err}${filter}.bedgraph
