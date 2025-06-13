@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # compare VCF calls to same genome VCF goldstandard reference
 # using Hap.py (docker)
@@ -47,9 +48,7 @@ nthr=${opt_thr:-4}
 # check if all dependencies are present
 declare -a arr=("samtools")
 for prog in "${arr[@]}"; do
-$( hash ${prog} 2>/dev/null ) || \
-  ( echo "# required ${prog} not found in PATH"
-exit 1 )
+  hash ${prog} 2>/dev/null || { echo "# required ${prog} not found in PATH"; exit 1; }
 done
 
 # Hap.py docker
@@ -58,8 +57,8 @@ BIN_VERSION="v0.3.12"
 img="${IMAGE}:${BIN_VERSION}"
 
 # check for the docker image
-res=$(docker images | grep ${img} | cut -d " " -f 1)
-if [ ! ${res} == "${IMAGE}" ]; then
+res=$(docker images | grep "${img}" | awk '{print $1}')
+if [ "${res}" != "${IMAGE}" ]; then
   echo "docker image not found"
   exit 1
 fi
@@ -78,7 +77,7 @@ if [ ! -f "${opt_calls}" ]; then
    exit 1
 fi
 
-callfile=$(basename ${opt_calls})
+callfile=$(basename "${opt_calls}")
 
 # check for VCF reference calls to be compared to (GIAB)
 if [ -z "${opt_gold}" ]; then
@@ -92,7 +91,7 @@ if [ ! -f "${opt_gold}" ]; then
     exit 1
 fi
 
-goldfile=$(basename ${opt_gold})
+goldfile=$(basename "${opt_gold}")
 
 # check for FASTA reference used for mapping
 if [ -z "${opt_ref}" ]; then
@@ -106,10 +105,14 @@ if [ ! -f "${opt_ref}" ]; then
     exit 1
 fi
 
-reffile=$(basename ${opt_ref})
+reffile=$(basename "${opt_ref}")
 
 # get file prefix and sample_name
-pfx=$(basename ${opt_calls%.vcf})
+if [[ "${opt_calls}" == *.vcf.gz ]]; then
+  pfx=$(basename "${opt_calls%.vcf.gz}")
+else
+  pfx=$(basename "${opt_calls%.vcf}")
+fi
 
 workdir=$PWD
 
@@ -119,7 +122,8 @@ output_dir="${workdir}/${outfolder}"
 
 # create local folders for inputs and results
 # docker does not work with non-local paths
-mkdir -p ${workdir}/${outfolder}/{input,logs}
+mkdir -p "${input_dir}"
+mkdir -p "${workdir}/${outfolder}/logs"
 
 #############################################
 # copy reference and mappings               #
@@ -130,20 +134,20 @@ echo "# REM: docker only works with local input files"
 # copy if not yet there
 if [ ! -f "${input_dir}/${callfile}" ]; then
 echo "# copying test VCF file (and index if present)"
-cp ${opt_calls}* ${input_dir}/
+cp "${opt_calls}"* "${input_dir}/"
 fi
 
 # copy if not yet there
 if [ ! -f "${input_dir}/${goldfile}" ]; then
 echo "# copying VCF reference (goldstandard) file (and index if present)"
-cp ${opt_gold}* ${input_dir}/
+cp "${opt_gold}"* "${input_dir}/"
 fi
 
 # copy if not yet there
 if [ ! -f "${input_dir}/${reffile}.fai" ]; then
 echo "# copying reference FASTA file"
-cp ${opt_ref} ${input_dir}/${reffile} && \
-  samtools faidx ${input_dir}/${reffile}
+cp "${opt_ref}" "${input_dir}/${reffile}" && \
+  samtools faidx "${input_dir}/${reffile}"
 fi
 
 #################################
@@ -181,6 +185,7 @@ eval ${CMD} > ${output_dir}/happy.${pfx}.output.txt 2>&1
 
 exit 0
 
+happy_info (){
 ######################################################
 ################### Command info #####################
 ######################################################
@@ -373,3 +378,4 @@ optional arguments:
                         stderr
   --verbose             Raise logging level from warning to info.
   --quiet               Set logging level to output errors only.
+}
