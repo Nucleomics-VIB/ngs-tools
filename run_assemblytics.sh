@@ -17,7 +17,7 @@
 # visit our Git: https://github.com/Nucleomics-VIB
 
 # check parameters for your system
-version="1.1, 2020_03_27"
+version="1.1.1, 2023_06_13"
 
 # path to the Assemblytics scripts should be in PATH
 # default_path_to_scripts="/opt/biotools/Assemblytics/scripts"
@@ -32,7 +32,16 @@ usage='# Usage: run_assemblytics.sh -x <reference (fasta)> -y <query-asm fasta)>
 # [optional: -p <path to scripts|default set in the code>]
 # [optional: -h <this help text>]'
 
-while getopts "x:y:o:w:m:M:t:h" opt; do
+# Initialize variables with defaults
+outpathopt="Assemblytics_results"
+uniqseqlen="10000"
+minl="50"
+maxl="10000"
+threads="4"
+path_to_scripts=""
+
+# Parse command line arguments
+while getopts "x:y:o:w:m:M:t:p:h" opt; do
   case $opt in
     x) assembly1=${OPTARG} ;;
     y) assembly2=${OPTARG} ;;
@@ -41,23 +50,30 @@ while getopts "x:y:o:w:m:M:t:h" opt; do
     m) minl=${OPTARG} ;;
     M) maxl=${OPTARG} ;;
     t) threads=${OPTARG} ;;
+    p) path_to_scripts=${OPTARG} ;;
     h) echo "${usage}" >&2; exit 0 ;;
-    \?) echo "Invalid option: -${OPTARG}" >&2; exit 1 ;;
-    *) echo "this command requires arguments, try -h" >&2; exit 1 ;;
+    \?) echo "Invalid option: -${OPTARG}" >&2; echo "${usage}" >&2; exit 1 ;;
+    :) echo "Option -${OPTARG} requires an argument." >&2; echo "${usage}" >&2; exit 1 ;;
   esac
 done
 
 # check executables present
 declare -a arr=( "nucmer"  "R" "Assemblytics" )
 for prog in "${arr[@]}"; do
-$( hash ${prog} 2>/dev/null ) || ( echo "# required ${prog} not found in PATH"; exit 1 )
+hash ${prog} 2>/dev/null || ( echo "# required ${prog} not found in PATH"; exit 1 )
 done
 
 # defaults parameters
-uniq_seq_len=${uniqseqlen:-"10000"}
-minlen=${minl:-50}
-maxlen=${maxl:-10000}
-thr=${threads:-4}
+uniq_seq_len=${uniqseqlen}
+minlen=${minl}
+maxlen=${maxl}
+thr=${threads}
+
+# Validate numeric parameters
+if ! [[ "$uniq_seq_len" =~ ^[0-9]+$ ]] || ! [[ "$minlen" =~ ^[0-9]+$ ]] || ! [[ "$maxlen" =~ ^[0-9]+$ ]] || ! [[ "$thr" =~ ^[0-9]+$ ]]; then
+  echo "Error: numeric parameters must be positive integers" >&2
+  exit 1
+fi
 
 # test if minimal arguments were provided
 if [ -z "${assembly1}" ]
@@ -86,10 +102,10 @@ fi
 
 # other parameters or defaults
 outpath=${outpathopt:-"Assemblytics_results"}
-asm1=$(basename ${assembly1%.f*})
-asm2=$(basename ${assembly2%.f*})
-deltabase=${asm2}_vs_${asm1}
-mkdir -p ${outpath}
+asm1=$(basename "${assembly1%.f*}")
+asm2=$(basename "${assembly2%.f*}")
+deltabase="${asm2}_vs_${asm1}"
+mkdir -p "${outpath}"
 
 # build the nucmer4 command
 nucmercmd="nucmer \
@@ -97,10 +113,10 @@ nucmercmd="nucmer \
     --threads=${thr} \
     --minmatch=100 \
     --mincluster=500 \
-    ${assembly1} \
-    ${assembly2} \
-    --prefix=${outpath}/${deltabase} \
-    > ${outpath}/assemblytics-log.txt 2>&1"
+    \"${assembly1}\" \
+    \"${assembly2}\" \
+    --prefix=\"${outpath}/${deltabase}\" \
+    > \"${outpath}/assemblytics-log.txt\" 2>&1"
 
 # show and execute
 echo "## pairwise alignments with nucmer:"
@@ -110,16 +126,22 @@ eval ${nucmercmd}
 # check for failure
 if [ $? -ne 0 ]; then
     echo "# the nucmer command failed, please check your inputs"
-    exit 0
+    exit 1  # Changed from exit 0 to exit 1 to indicate error
+fi
+
+# Check if delta file was created
+if [ ! -f "${outpath}/${deltabase}.delta" ]; then
+    echo "# Error: Delta file was not created by nucmer"
+    exit 1
 fi
 
 # build the Assemblytics command
-cmd="Assemblytics ${outpath}/${deltabase}.delta \
-    ${outpath}/${deltabase} \
+cmd="Assemblytics \"${outpath}/${deltabase}.delta\" \
+    \"${outpath}/${deltabase}\" \
     ${uniq_seq_len} \
     ${minlen} \
     ${maxlen} \
-    >> ${outpath}/assemblytics-log.txt 2>&1"
+    >> \"${outpath}/assemblytics-log.txt\" 2>&1"
 
 # show and execute
 echo
@@ -127,6 +149,13 @@ echo "## Assemblytics analysis:"
 echo "# ${cmd}"
 eval ${cmd}
 
+# Check Assemblytics exit status
+if [ $? -ne 0 ]; then
+    echo "# Error: Assemblytics command failed"
+    exit 1
+fi
+
+echo "# Assemblytics analysis completed successfully"
 exit 0
 
 ########################################################################################
