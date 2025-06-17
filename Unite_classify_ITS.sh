@@ -13,9 +13,9 @@
 # ============================================================================
 
 # Script metadata
-SCRIPT_VERSION="1.0.0"
+SCRIPT_VERSION="1.0.1"
 SCRIPT_AUTHOR="SP@NC (+AI)"
-REVISION_DATE="June 12, 2025"
+REVISION_DATE="June 17, 2025"
 
 # Exit on error
 set -e
@@ -46,7 +46,7 @@ usage() {
   echo "Usage: $0 -i INPUT.fa [options]"
   echo
   echo "Required arguments:"
-  echo "  -i FILE     Input fasta file with OTU sequences"
+  echo "  -i FILE     Input fasta file with OTU sequences (can be gzipped)"
   echo
   echo "Optional arguments:"
   echo "  -o DIR      Output directory (default: current directory)"
@@ -153,14 +153,29 @@ process_fasta() {
   local base_name=$(basename "$input_file")
   local input_name_no_ext="${base_name%.*}"
   
-  # Copy the input file to the results directory for portability - keep original name
-  echo "Copying input file to results directory..."
-  echo "# cp ${input_file} ${results_dir}/"
-  cp "$input_file" "${results_dir}/"
-  local copied_input="${results_dir}/${base_name}"
+  # Check if input file is gzipped and decompress during copy if needed
+  local copied_input=""
+  if [[ "$input_file" == *.gz ]]; then
+    echo "Detected gzipped input file"
+    # Remove .gz extension to get the base name
+    local uncompressed_name="${input_name_no_ext}"
+    
+    echo "Decompressing input file to results directory..."
+    echo "# gunzip -c ${input_file} > ${results_dir}/${uncompressed_name}"
+    gunzip -c "$input_file" > "${results_dir}/${uncompressed_name}"
+    copied_input="${results_dir}/${uncompressed_name}"
+    
+    echo "Created uncompressed version: ${copied_input}"
+  else
+    # Copy the input file to the results directory for portability
+    echo "Copying input file to results directory..."
+    echo "# cp ${input_file} ${results_dir}/"
+    cp "$input_file" "${results_dir}/"
+    copied_input="${results_dir}/${base_name}"
+  fi
   
-  # Import sequences - use the copied file but with generic output name
-  echo "Importing sequences from copied input file..."
+  # Import sequences - use the copied/uncompressed file
+  echo "Importing sequences from input file..."
   echo "# qiime tools import --type 'FeatureData[Sequence]' --input-path ${copied_input} --output-path ${results_dir}/sequences.qza"
   qiime tools import \
     --type 'FeatureData[Sequence]' \
@@ -216,38 +231,88 @@ echo "All results will be saved to: ${RESULTS_DIR}"
 echo "# mkdir -p ${UNITE_DIR}"
 mkdir -p "$UNITE_DIR"
 
-# Check if required conda environment exists
-echo "# Checking for conda environment: ${QIIME_ENV}"
-if ! conda env list | grep -q "${QIIME_ENV}"; then
-  echo "Error: Required conda environment '${QIIME_ENV}' not found!"
-  echo "Please create it with: conda create -n ${QIIME_ENV} -c qiime2 qiime2"
-  exit 1
-fi
+# Function to train Naive Bayes classifier
+train_classifier() {
+    if [ -f "$CLASSIFIER_QZA" ]; then
+        echo "$CLASSIFIER_QZA already exists. Skipping classifier training."
+        return 0
+    fi
+    
+    echo "Training Naive Bayes classifier (this step can take a long time)..."
+    if qiime feature-classifier fit-classifier-naive-bayes \
+         --i-reference-reads "$SEQ_QZA" \
+         --i-reference-taxonomy "$TAX_QZA" \
+         --o-classifier "$CLASSIFIER_QZA"; then
+        echo "Classifier training complete."
+        return 0
+    else
+        echo "ERROR: Failed to train Naive Bayes classifier."
+        return 1
+    fi
+}
 
-# Activate QIIME2 environment
-echo "Activating QIIME2 environment..."
-echo "# conda activate ${QIIME_ENV}"
-eval "$(conda shell.bash hook)"
-conda activate "${QIIME_ENV}"
+# Main function to orchestrate the workflow
+main() {
+    local download_url="$1"
+    
+    # Initialize variables
+    init_variables "$download_url"
+    
+    # Check prerequisites
+    if ! check_prerequisites; then
+        echo "Prerequisite check failed. Exiting."
+        exit 1
+    fi
+    
+    # Execute each step in sequence, stopping if any fails
+    if ! download_zip; then
+        echo "Download failed. Exiting."
+        exit 1
+    fi
+    
+    if ! extract_zip; then
+        echo "Extraction failed. Exiting."
+        exit 1
+    fi
+    
+    if ! create_qiime_fasta; then
+        echo "FASTA preparation failed. Exiting."
+        exit 1
+    fi
+    
+    if ! create_taxonomy_tsv; then
+        echo "Taxonomy preparation failed. Exiting."
+        exit 1
+    fi
+    
+    if ! activate_qiime; then
+        echo "QIIME 2 activation failed. Exiting."
+        exit 1
+    fi
+    
+    if ! import_sequences; then
+        echo "Sequence import failed. Exiting."
+        exit 1
+    fi
+    
+    if ! import_taxonomy; then
+        echo "Taxonomy import failed. Exiting."
+        exit 1
+    fi
+    
+    if ! train_classifier; then
+        echo "Classifier training failed. Exiting."
+        exit 1
+    fi
+    
+    echo "All steps complete."
+    echo "QIIME 2 artifacts created (if not already present):"
+    echo "  Sequences:  $SEQ_QZA"
+    echo "  Taxonomy:   $TAX_QZA"
+    echo "  Classifier: $CLASSIFIER_QZA"
+    
+    return 0
+}
 
-# Get or build the classifier
-echo "# Getting classifier..."
-CLASSIFIER_PATH=$(get_classifier "$UNITE_DIR" "$UNITE_VERSION" "$TAXON_GROUP" "$CLUSTER_ID" "$THREADS")
-
-# Save a copy of the classifier information
-echo "# Creating classification_info.txt"
-echo "Classification parameters:" > "${RESULTS_DIR}/classification_info.txt"
-echo "Date: $(date)" >> "${RESULTS_DIR}/classification_info.txt"
-echo "Input file: ${INPUT_FASTA}" >> "${RESULTS_DIR}/classification_info.txt"
-echo "UNITE version: ${UNITE_VERSION}" >> "${RESULTS_DIR}/classification_info.txt"
-echo "Taxon group: ${TAXON_GROUP}" >> "${RESULTS_DIR}/classification_info.txt"
-echo "Cluster ID: ${CLUSTER_ID}" >> "${RESULTS_DIR}/classification_info.txt"
-echo "Threads: ${THREADS}" >> "${RESULTS_DIR}/classification_info.txt"
-echo "Classifier: ${CLASSIFIER_PATH}" >> "${RESULTS_DIR}/classification_info.txt"
-
-# Process the input fasta file with generic output names
-echo "# Processing input fasta file..."
-process_fasta "$INPUT_FASTA" "$CLASSIFIER_PATH" "$RESULTS_DIR" "$THREADS" "$BATCH_SIZE"
-
-echo "ITS classification completed!"
-echo "Results saved to: ${RESULTS_DIR}"
+# Execute the main function with all arguments
+main "$@"
