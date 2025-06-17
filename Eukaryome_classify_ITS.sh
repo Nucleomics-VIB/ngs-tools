@@ -4,11 +4,9 @@
 # Script: Eukaryome_classify_ITS.sh
 # Description: Classify OTU representative sequences with the Eukaryome reference DB
 #
-# Author: Stephane Plaisance (VIB-NC)
-# Modified by: SP@NC
-#
-# Visit our Git: https://github.com/Nucleomics-VIB
-###############################################################################
+# Usage: ./Eukaryome_classify_ITS.sh -i INPUT.fa [options]
+# SP@NC - email nucleomics@vib.be
+# ============================================================================
 
 SCRIPT_VERSION="1.0"
 SCRIPT_AUTHOR="SP@NC"
