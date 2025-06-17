@@ -231,88 +231,38 @@ echo "All results will be saved to: ${RESULTS_DIR}"
 echo "# mkdir -p ${UNITE_DIR}"
 mkdir -p "$UNITE_DIR"
 
-# Function to train Naive Bayes classifier
-train_classifier() {
-    if [ -f "$CLASSIFIER_QZA" ]; then
-        echo "$CLASSIFIER_QZA already exists. Skipping classifier training."
-        return 0
-    fi
-    
-    echo "Training Naive Bayes classifier (this step can take a long time)..."
-    if qiime feature-classifier fit-classifier-naive-bayes \
-         --i-reference-reads "$SEQ_QZA" \
-         --i-reference-taxonomy "$TAX_QZA" \
-         --o-classifier "$CLASSIFIER_QZA"; then
-        echo "Classifier training complete."
-        return 0
-    else
-        echo "ERROR: Failed to train Naive Bayes classifier."
-        return 1
-    fi
-}
+# Check if required conda environment exists
+echo "# Checking for conda environment: ${QIIME_ENV}"
+if ! conda env list | grep -q "${QIIME_ENV}"; then
+  echo "Error: Required conda environment '${QIIME_ENV}' not found!"
+  echo "Please create it with: conda create -n ${QIIME_ENV} -c qiime2 qiime2"
+  exit 1
+fi
 
-# Main function to orchestrate the workflow
-main() {
-    local download_url="$1"
-    
-    # Initialize variables
-    init_variables "$download_url"
-    
-    # Check prerequisites
-    if ! check_prerequisites; then
-        echo "Prerequisite check failed. Exiting."
-        exit 1
-    fi
-    
-    # Execute each step in sequence, stopping if any fails
-    if ! download_zip; then
-        echo "Download failed. Exiting."
-        exit 1
-    fi
-    
-    if ! extract_zip; then
-        echo "Extraction failed. Exiting."
-        exit 1
-    fi
-    
-    if ! create_qiime_fasta; then
-        echo "FASTA preparation failed. Exiting."
-        exit 1
-    fi
-    
-    if ! create_taxonomy_tsv; then
-        echo "Taxonomy preparation failed. Exiting."
-        exit 1
-    fi
-    
-    if ! activate_qiime; then
-        echo "QIIME 2 activation failed. Exiting."
-        exit 1
-    fi
-    
-    if ! import_sequences; then
-        echo "Sequence import failed. Exiting."
-        exit 1
-    fi
-    
-    if ! import_taxonomy; then
-        echo "Taxonomy import failed. Exiting."
-        exit 1
-    fi
-    
-    if ! train_classifier; then
-        echo "Classifier training failed. Exiting."
-        exit 1
-    fi
-    
-    echo "All steps complete."
-    echo "QIIME 2 artifacts created (if not already present):"
-    echo "  Sequences:  $SEQ_QZA"
-    echo "  Taxonomy:   $TAX_QZA"
-    echo "  Classifier: $CLASSIFIER_QZA"
-    
-    return 0
-}
+# Activate QIIME2 environment
+echo "Activating QIIME2 environment..."
+echo "# conda activate ${QIIME_ENV}"
+eval "$(conda shell.bash hook)"
+conda activate "${QIIME_ENV}"
 
-# Execute the main function with all arguments
-main "$@"
+# Get or build the classifier
+echo "# Getting classifier..."
+CLASSIFIER_PATH=$(get_classifier "$UNITE_DIR" "$UNITE_VERSION" "$TAXON_GROUP" "$CLUSTER_ID" "$THREADS")
+
+# Save a copy of the classifier information
+echo "# Creating classification_info.txt"
+echo "Classification parameters:" > "${RESULTS_DIR}/classification_info.txt"
+echo "Date: $(date)" >> "${RESULTS_DIR}/classification_info.txt"
+echo "Input file: ${INPUT_FASTA}" >> "${RESULTS_DIR}/classification_info.txt"
+echo "UNITE version: ${UNITE_VERSION}" >> "${RESULTS_DIR}/classification_info.txt"
+echo "Taxon group: ${TAXON_GROUP}" >> "${RESULTS_DIR}/classification_info.txt"
+echo "Cluster ID: ${CLUSTER_ID}" >> "${RESULTS_DIR}/classification_info.txt"
+echo "Threads: ${THREADS}" >> "${RESULTS_DIR}/classification_info.txt"
+echo "Classifier: ${CLASSIFIER_PATH}" >> "${RESULTS_DIR}/classification_info.txt"
+
+# Process the input fasta file with generic output names
+echo "# Processing input fasta file..."
+process_fasta "$INPUT_FASTA" "$CLASSIFIER_PATH" "$RESULTS_DIR" "$THREADS" "$BATCH_SIZE"
+
+echo "ITS classification completed!"
+echo "Results saved to: ${RESULTS_DIR}"
