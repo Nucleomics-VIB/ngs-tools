@@ -32,17 +32,17 @@ usage='# Usage: run_Deepvariant.sh -b <Aligned, sorted, indexed BAM file> -r <re
 
 while getopts "b:r:n:m:t:X:h" opt; do
   case $opt in
-    b) opt_mappings=${OPTARG} ;;
-    r) opt_ref=${OPTARG} ;;
-    n) opt_name=${OPTARG} ;;
-    m) opt_model=${OPTARG} ;;
-    t) opt_thr=${OPTARG} ;;
-    X) opt_extra=${OPTARG} ;;
-    h) echo "${usage}" >&2; exit 0 ;;
-    \?) echo "Invalid option: -${OPTARG}" >&2;
-       exit 1 ;;
-    *) echo "this command requires arguments, try -h" >&2;
-       exit 1 ;;
+#    b) opt_mappings=${OPTARG} ;;
+#    r) opt_ref=${OPTARG} ;;
+#    n) opt_name=${OPTARG} ;;
+#    m) opt_model=${OPTARG} ;;
+#    t) opt_thr=${OPTARG} ;;
+#    X) opt_extra=${OPTARG} ;;
+#    h) echo "${usage}" >&2; exit 0 ;;
+#    \?) echo "Invalid option: -${OPTARG}" >&2;
+#       exit 1 ;;
+#    *) echo "this command requires arguments, try -h" >&2;
+#       exit 1 ;;
   esac
 done
 
@@ -149,17 +149,17 @@ time docker run \
   -v "${output_dir}":"/output" \
   ${img} \
   /opt/deepvariant/bin/run_deepvariant \
-  --model_type=${model} \
-  --ref=/input/${reffile} \
-  --reads=/input/${mappingfile} \
-  --sample_name=${pfx} \
-  --output_vcf=/output/${pfx}.vcf.gz \
-  --output_gvcf=/output/${pfx}.g.vcf.gz \
-  --vcf_stats_report \
-  --intermediate_results_dir=/output/intermediate_results_dir \
-  --logging_dir=/output/logs \
-  --num_shards=${nthr} \
-  ${extra}
+    --model_type=${model} \
+    --ref=/input/${reffile} \
+    --reads=/input/${mappingfile} \
+    --sample_name=${pfx} \
+    --output_vcf=/output/${pfx}.vcf.gz \
+    --output_gvcf=/output/${pfx}.g.vcf.gz \
+    --vcf_stats_report \
+    --intermediate_results_dir=/output/intermediate_results_dir \
+    --logging_dir=/output/logs \
+    --num_shards=${nthr} \
+    ${extra}
 EOF
 
 echo "# ${CMD}"
@@ -184,63 +184,63 @@ exit 0
 ################### Command info #####################
 ######################################################
 
-For more details, see:
-https://github.com/google/deepvariant/blob/r1.5/docs/deepvariant-quick-start.md
+# For more details, see:
+# https://github.com/google/deepvariant/blob/r1.5/docs/deepvariant-quick-start.md
+#
+# flags:
+#
+# /opt/deepvariant/bin/run_deepvariant.py:
+#  --call_variants_extra_args: A comma-separated list of flag_name=flag_value.
+#    "flag_name" has to be valid flags for call_variants.py. If the flag_value is
+#    boolean, it has to be flag_name=true or flag_name=false.
+#  --customized_model: Optional. A path to a model checkpoint to load for the
+#    `call_variants` step. If not set, the default for each --model_type will be
+#    used
+#  --[no]dry_run: Optional. If True, only prints out commands without executing
+#    them.
+#    (default: 'false')
+#  --intermediate_results_dir: Optional. If specified, this should be an existing
+#    directory that is visible insider docker, and will be used to to store
+#    intermediate outputs.
+#  --logging_dir: Optional. Directory where we should write log files for each
+#    stage and optionally runtime reports.
+#  --make_examples_extra_args: A comma-separated list of flag_name=flag_value.
+#    "flag_name" has to be valid flags for make_examples.py. If the flag_value is
+#    boolean, it has to be flag_name=true or flag_name=false.
+#  --model_type: <WGS|WES|PACBIO|ONT_R104|HYBRID_PACBIO_ILLUMINA>: Required. Type
+#    of model to use for variant calling. Set this flag to use the default model
+#    associated with each type, and it will set necessary flags corresponding to
+#    each model. If you want to use a customized model, add --customized_model
+#    flag in addition to this flag.
+#  --num_shards: Optional. Number of shards for make_examples step.
+#    (default: '1')
+#    (an integer)
+#  --output_gvcf: Optional. Path where we should write gVCF file.
+#  --output_vcf: Required. Path where we should write VCF file.
+#  --postprocess_variants_extra_args: A comma-separated list of
+#    flag_name=flag_value. "flag_name" has to be valid flags for
+#    postprocess_variants.py. If the flag_value is boolean, it has to be
+#    flag_name=true or flag_name=false.
+#  --reads: Required. Aligned, sorted, indexed BAM file containing the reads we
+#    want to call. Should be aligned to a reference genome compatible with --ref.
+#  --ref: Required. Genome reference to use. Must have an associated FAI index as
+#    well. Supports text or gzipped references. Should match the reference used
+#    to align the BAM file provided to --reads.
+#  --regions: Optional. Space-separated list of regions we want to process.
+#    Elements can be region literals (e.g., chr20:10-20) or paths to BED/BEDPE
+#    files.
+#  --[no]runtime_report: Output make_examples runtime metrics and create a visual
+#    runtime report using runtime_by_region_vis. Only works with --logging_dir.
+#    (default: 'false')
+#  --sample_name: Sample name to use instead of the sample name from the input
+#    reads BAM (SM tag in the header). This flag is used for both make_examples
+#    and postprocess_variants.
+#  --[no]use_hp_information: (Deprecated in v1.4.0) Optional. If True,
+#    corresponding flags will be set to properly use the HP information present
+#    in the BAM input.
+#  --[no]vcf_stats_report: Optional. Output a visual report (HTML) of statistics
+#    about the output VCF.
+#    (default: 'true')
+#  --[no]version: Optional. If true, print out version number and exit.
 
-flags:
-
-/opt/deepvariant/bin/run_deepvariant.py:
-  --call_variants_extra_args: A comma-separated list of flag_name=flag_value.
-    "flag_name" has to be valid flags for call_variants.py. If the flag_value is
-    boolean, it has to be flag_name=true or flag_name=false.
-  --customized_model: Optional. A path to a model checkpoint to load for the
-    `call_variants` step. If not set, the default for each --model_type will be
-    used
-  --[no]dry_run: Optional. If True, only prints out commands without executing
-    them.
-    (default: 'false')
-  --intermediate_results_dir: Optional. If specified, this should be an existing
-    directory that is visible insider docker, and will be used to to store
-    intermediate outputs.
-  --logging_dir: Optional. Directory where we should write log files for each
-    stage and optionally runtime reports.
-  --make_examples_extra_args: A comma-separated list of flag_name=flag_value.
-    "flag_name" has to be valid flags for make_examples.py. If the flag_value is
-    boolean, it has to be flag_name=true or flag_name=false.
-  --model_type: <WGS|WES|PACBIO|ONT_R104|HYBRID_PACBIO_ILLUMINA>: Required. Type
-    of model to use for variant calling. Set this flag to use the default model
-    associated with each type, and it will set necessary flags corresponding to
-    each model. If you want to use a customized model, add --customized_model
-    flag in addition to this flag.
-  --num_shards: Optional. Number of shards for make_examples step.
-    (default: '1')
-    (an integer)
-  --output_gvcf: Optional. Path where we should write gVCF file.
-  --output_vcf: Required. Path where we should write VCF file.
-  --postprocess_variants_extra_args: A comma-separated list of
-    flag_name=flag_value. "flag_name" has to be valid flags for
-    postprocess_variants.py. If the flag_value is boolean, it has to be
-    flag_name=true or flag_name=false.
-  --reads: Required. Aligned, sorted, indexed BAM file containing the reads we
-    want to call. Should be aligned to a reference genome compatible with --ref.
-  --ref: Required. Genome reference to use. Must have an associated FAI index as
-    well. Supports text or gzipped references. Should match the reference used
-    to align the BAM file provided to --reads.
-  --regions: Optional. Space-separated list of regions we want to process.
-    Elements can be region literals (e.g., chr20:10-20) or paths to BED/BEDPE
-    files.
-  --[no]runtime_report: Output make_examples runtime metrics and create a visual
-    runtime report using runtime_by_region_vis. Only works with --logging_dir.
-    (default: 'false')
-  --sample_name: Sample name to use instead of the sample name from the input
-    reads BAM (SM tag in the header). This flag is used for both make_examples
-    and postprocess_variants.
-  --[no]use_hp_information: (Deprecated in v1.4.0) Optional. If True,
-    corresponding flags will be set to properly use the HP information present
-    in the BAM input.
-  --[no]vcf_stats_report: Optional. Output a visual report (HTML) of statistics
-    about the output VCF.
-    (default: 'true')
-  --[no]version: Optional. If true, print out version number and exit.
-
-Try --helpfull to get a list of all flags.
+#Try --helpfull to get a list of all flags.

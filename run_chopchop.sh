@@ -72,7 +72,7 @@ function enrich_run() {
 		--consensusUnion \
 		--makePrimers \
 		--displaySeqFlanks 300 \
-		--nonOverlapping" \
+		--nonOverlapping \
 		--limitPrintResults ${limitPrintResults} \
 		--outputDir ${outdir} \
 		--genome ${genome} \

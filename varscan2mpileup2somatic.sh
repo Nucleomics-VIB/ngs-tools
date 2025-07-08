@@ -62,11 +62,6 @@ then
    echo "${usage}"
    exit 1
 fi
-then
-   echo "# Two BAM files are required in order: Normal Tumour!"
-   echo "${usage}"
-   exit 1
-fi
 
 # check if exists or die
 [ -f ${bam_normal} ] || ( echo "## ERROR! Father ${bam_normal} input not found" ; exit 1 )
