@@ -32,17 +32,17 @@ usage='# Usage: run_Deepvariant.sh -b <Aligned, sorted, indexed BAM file> -r <re
 
 while getopts "b:r:n:m:t:X:h" opt; do
   case $opt in
-#    b) opt_mappings=${OPTARG} ;;
-#    r) opt_ref=${OPTARG} ;;
-#    n) opt_name=${OPTARG} ;;
-#    m) opt_model=${OPTARG} ;;
-#    t) opt_thr=${OPTARG} ;;
-#    X) opt_extra=${OPTARG} ;;
-#    h) echo "${usage}" >&2; exit 0 ;;
-#    \?) echo "Invalid option: -${OPTARG}" >&2;
-#       exit 1 ;;
-#    *) echo "this command requires arguments, try -h" >&2;
-#       exit 1 ;;
+    b) opt_mappings=${OPTARG} ;;
+    r) opt_ref=${OPTARG} ;;
+    n) opt_name=${OPTARG} ;;
+    m) opt_model=${OPTARG} ;;
+    t) opt_thr=${OPTARG} ;;
+    X) opt_extra=${OPTARG} ;;
+    h) echo "${usage}" >&2; exit 0 ;;
+    \?) echo "Invalid option: -${OPTARG}" >&2;
+       exit 1 ;;
+    *) echo "this command requires arguments, try -h" >&2;
+       exit 1 ;;
   esac
 done
 
