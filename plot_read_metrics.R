@@ -8,7 +8,7 @@
 # eg: zcat ${fastq}.gz | fastq2metrics > fastq_metrics.txt
 
 # R libraries
-suppressMessages(library("optparse")
+suppressMessages(library("optparse"))
 suppressMessages(library("readr"))
 suppressMessages(library("plyr"))
 suppressMessages(library("ggplot2"))
