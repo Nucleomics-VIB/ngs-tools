@@ -90,3 +90,20 @@ if [[ $? -eq 0 ]]; then
 else
   echo "Error occurred during processing. Temporary files retained in ${TMP_DIR}." >&2
 fi
+
+exit 0
+
+# qiime rescript get-unite-data --help
+# Parameters:
+#   --p-version TEXT Choices('2025-02-19', '2024-04-04', '2023-07-18',
+#     '2022-10-16', '2021-05-10', '2020-02-20')
+#                           UNITE version to download.   [default: '2025-02-19']
+#   --p-taxon-group TEXT Choices('fungi', 'eukaryotes')
+#                           Download a database with only 'fungi' or including
+#                           all 'eukaryotes'.            [default: 'eukaryotes']
+#   --p-cluster-id TEXT Choices('99', '97', 'dynamic')
+#                           Percent similarity at which sequences in the of
+#                           database were clustered.             [default: '99']
+#   --p-singletons / --p-no-singletons
+#                           Include singleton clusters in the database.
+#                                                               [default: False]
