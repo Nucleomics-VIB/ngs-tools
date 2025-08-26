@@ -2,27 +2,28 @@
 
 # ============================================================================
 # Unite_classify_ITS.sh - Taxonomic classification of ITS sequences using QIIME2
-# 
+#
 # This script:
 # 1. Downloads UNITE reference data (if needed)
 # 2. Creates a classifier (if needed)
-# 3. Classifies OTU sequences against the UNITE database
-# 
+# 3. Classifies OTU sequences against the UNITE database using naive Bayes (sklearn)
+# 4. Classifies OTU sequences against the UNITE database using Vsearch
+#
 # Usage: ./Unite_classify_ITS.sh -i INPUT.fa [options]
 # SP@NC - email nucleomics@vib.be
 # ============================================================================
 
 # Script metadata
-SCRIPT_VERSION="1.0.1"
+SCRIPT_VERSION="1.1.0"
 SCRIPT_AUTHOR="SP@NC (+AI)"
-REVISION_DATE="June 17, 2025"
+REVISION_DATE="August 26, 2025"
 
 # Exit on error
 set -e
 
 # Function to echo commands before executing them
 echo_cmd() {
-  echo "# $@"
+  echo "# $*"
   "$@"
 }
 
@@ -101,19 +102,19 @@ get_classifier() {
   local taxon_group="$3"
   local cluster_id="$4"
   local threads="$5"
-  
+
   # Create UNITE directory if it doesn't exist (silently)
   mkdir -p "${unite_dir}" >&2
-  
+
   # Prepare classifier name with version information
   local classifier_name="unite-classifier-${taxon_group}_${cluster_id}pc_${unite_version}.qza"
   local taxonomy_name="unite-taxonomy-${taxon_group}_${cluster_id}pc_${unite_version}.qza"
   local sequences_name="unite-sequences-${taxon_group}_${cluster_id}pc_${unite_version}.qza"
-  
+
   # Check if classifier already exists
   if [ ! -f "${unite_dir}/${classifier_name}" ]; then
     echo "Classifier not found. Building new classifier..." >&2
-    
+
     # Download UNITE reference data
     echo "Downloading UNITE reference data (version: ${unite_version})..." >&2
     echo "# qiime rescript get-unite-data --p-version ${unite_version} --p-taxon-group ${taxon_group} --p-cluster-id ${cluster_id} --o-taxonomy ${unite_dir}/${taxonomy_name} --o-sequences ${unite_dir}/${sequences_name}" >&2
@@ -123,7 +124,7 @@ get_classifier() {
       --p-cluster-id "${cluster_id}" \
       --o-taxonomy "${unite_dir}/${taxonomy_name}" \
       --o-sequences "${unite_dir}/${sequences_name}" >&2
-    
+
     # Build the classifier (with multithreading)
     echo "Building naive Bayes classifier (using ${threads} threads)..." >&2
     echo "# qiime feature-classifier fit-classifier-naive-bayes --i-reference-reads ${unite_dir}/${sequences_name} --i-reference-taxonomy ${unite_dir}/${taxonomy_name} --o-classifier ${unite_dir}/${classifier_name} --p-n-jobs ${threads}" >&2
@@ -132,12 +133,12 @@ get_classifier() {
       --i-reference-taxonomy "${unite_dir}/${taxonomy_name}" \
       --o-classifier "${unite_dir}/${classifier_name}" \
       --p-n-jobs "${threads}" >&2
-    
+
     echo "Classifier built and saved to ${unite_dir}/${classifier_name}" >&2
   else
     echo "Using existing classifier: ${unite_dir}/${classifier_name}" >&2
   fi
-  
+
   # Return ONLY the full path to the classifier
   echo "${unite_dir}/${classifier_name}"
 }
@@ -149,22 +150,22 @@ process_fasta() {
   local results_dir="$3"
   local threads="$4"
   local batch_size="$5"
-  
+
   local base_name=$(basename "$input_file")
   local input_name_no_ext="${base_name%.*}"
-  
+
   # Check if input file is gzipped and decompress during copy if needed
   local copied_input=""
   if [[ "$input_file" == *.gz ]]; then
     echo "Detected gzipped input file"
     # Remove .gz extension to get the base name
     local uncompressed_name="${input_name_no_ext}"
-    
+
     echo "Decompressing input file to results directory..."
     echo "# gunzip -c ${input_file} > ${results_dir}/${uncompressed_name}"
     gunzip -c "$input_file" > "${results_dir}/${uncompressed_name}"
     copied_input="${results_dir}/${uncompressed_name}"
-    
+
     echo "Created uncompressed version: ${copied_input}"
   else
     # Copy the input file to the results directory for portability
@@ -173,7 +174,7 @@ process_fasta() {
     cp "$input_file" "${results_dir}/"
     copied_input="${results_dir}/${base_name}"
   fi
-  
+
   # Import sequences - use the copied/uncompressed file
   echo "Importing sequences from input file..."
   echo "# qiime tools import --type 'FeatureData[Sequence]' --input-path ${copied_input} --output-path ${results_dir}/sequences.qza"
@@ -181,40 +182,79 @@ process_fasta() {
     --type 'FeatureData[Sequence]' \
     --input-path "${copied_input}" \
     --output-path "${results_dir}/sequences.qza"
-  
-  # Classify sequences with generic output name (with multithreading)
+
+  ##################################
+  # Classify sequences with sklearn and generic output name (with multithreading)
   echo "Classifying sequences against UNITE database (using ${threads} threads)..."
   echo "# qiime feature-classifier classify-sklearn --i-classifier ${classifier} --i-reads ${results_dir}/sequences.qza --o-classification ${results_dir}/taxonomy.qza --p-n-jobs ${threads} --p-reads-per-batch ${batch_size} --p-pre-dispatch '2*n_jobs'"
   qiime feature-classifier classify-sklearn \
     --i-classifier "${classifier}" \
     --i-reads "${results_dir}/sequences.qza" \
-    --o-classification "${results_dir}/taxonomy.qza" \
+    --o-classification "${results_dir}/sklearn_taxonomy.qza" \
     --p-n-jobs "${threads}" \
     --p-reads-per-batch "${batch_size}" \
     --p-pre-dispatch "2*n_jobs"
-  
+
   # Create a temporary directory for export
   local tmp_export_dir="/tmp/taxonomy-export-$$-${RANDOM}"
-  
+
   # Export taxonomy results to temporary directory
   echo "Exporting taxonomy results..."
-  echo "# qiime tools export --input-path ${results_dir}/taxonomy.qza --output-path ${tmp_export_dir}"
+  echo "# qiime tools export --input-path ${results_dir}/sklearn_taxonomy.qza --output-path ${tmp_export_dir}"
   qiime tools export \
-    --input-path "${results_dir}/taxonomy.qza" \
+    --input-path "${results_dir}/sklearn_taxonomy.qza" \
     --output-path "${tmp_export_dir}"
-  
+
   # Move only the taxonomy.tsv file to the results directory with the desired name
   echo "Moving taxonomy file to results directory..."
-  echo "# mv ${tmp_export_dir}/taxonomy.tsv ${results_dir}/classified_${input_name_no_ext}.tsv"
-  mv "${tmp_export_dir}/taxonomy.tsv" "${results_dir}/classified_${input_name_no_ext}.tsv"
-  
+  echo "# mv ${tmp_export_dir}/taxonomy.tsv ${results_dir}/sklearn_classified_${input_name_no_ext}.tsv"
+  mv "${tmp_export_dir}/taxonomy.tsv" "${results_dir}/sklearn_classified_${input_name_no_ext}.tsv"
+
   # Clean up the temporary directory
   echo "Cleaning up temporary files..."
   echo "# rm -rf ${tmp_export_dir}"
   rm -rf "${tmp_export_dir}"
-  
-  echo "Classification complete for ${base_name}"
-  echo "Results saved as: ${results_dir}/classified_${input_name_no_ext}.tsv"
+
+  echo "Sklearn Classification complete for ${base_name}"
+  echo "Results saved as: ${results_dir}/sklearn_classified_${input_name_no_ext}.tsv"
+
+  ##################################
+  # Classify sequences using vsearch
+  echo "Classifying sequences against UNITE database using vsearch (threads: ${threads})..."
+  echo "# qiime feature-classifier classify-consensus-vsearch --i-query ${results_dir}/sequences.qza --i-reference-reads ${sequences_name} --i-reference-taxonomy ${taxonomy_name} --o-classification ${results_dir}/vsearch_taxonomy.qza --p-threads ${threads} --p-maxaccepts 10 --p-perc-identity 0.8"
+  qiime feature-classifier classify-consensus-vsearch \
+    --i-query "${results_dir}/sequences.qza" \
+    --i-reference-reads "${sequences_name}" \
+    --i-reference-taxonomy "${taxonomy_name}" \
+    --o-classification "${results_dir}/vsearch_taxonomy.qza" \
+    --p-threads "${threads}" \
+    --p-maxaccepts 10 \
+    --p-perc-identity 0.8
+
+  # Create a temporary directory for vsearch export
+  local tmp_vsearch_export_dir="/tmp/vsearch-taxonomy-export-$$-${RANDOM}"
+
+  # Export vsearch taxonomy results to temporary directory
+  echo "Exporting vsearch taxonomy results..."
+  echo "# qiime tools export --input-path ${results_dir}/vsearch_taxonomy.qza --output-path ${tmp_vsearch_export_dir}"
+  qiime tools export \
+    --input-path "${results_dir}/vsearch_taxonomy.qza" \
+    --output-path "${tmp_vsearch_export_dir}"
+
+  # Move only the taxonomy.tsv file to the results directory with the desired name
+  echo "Moving vsearch taxonomy file to results directory..."
+  echo "# mv ${tmp_vsearch_export_dir}/taxonomy.tsv ${results_dir}/vsearch_classified_${input_name_no_ext}.tsv"
+  mv "${tmp_vsearch_export_dir}/taxonomy.tsv" "${results_dir}/vsearch_classified_${input_name_no_ext}.tsv"
+
+  # Clean up the vsearch temporary directory
+  echo "Cleaning up vsearch temporary files..."
+  echo "# rm -rf ${tmp_vsearch_export_dir}"
+  rm -rf "${tmp_vsearch_export_dir}"
+
+  # Notify user of completion
+  echo "VSEARCH classification complete for ${base_name}"
+  echo "Results saved as: ${results_dir}/vsearch_classified_${input_name_no_ext}.tsv"
+
 }
 
 # Create output directory if it doesn't exist
