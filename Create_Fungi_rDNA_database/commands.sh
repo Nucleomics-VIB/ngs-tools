@@ -47,8 +47,8 @@ mkdir -p ${outfolder}
 for fasta in $(find . -name "*.fna"); do
     base=$(basename $(dirname "$fasta"))
 
-    # 1. Extract classification and append to classification.txt
-	datasets summary genome accession "$base" | jq -r "\"$base\t\" + .reports[0].organism.organism_name" >> classification.txt
+    # 1. Extract classification and append to classification.csv
+	#datasets summary genome accession "$base" | jq -r "\"$base,\" + .reports[0].organism.organism_name" >> classification.csv
 
 	# 2. Predict rDNA genes with Barrnap
 	barrnap --kingdom euk --threads 4 "$fasta" > "${outfolder}/${base}_barrnap_output.gff"
