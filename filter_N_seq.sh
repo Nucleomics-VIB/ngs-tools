@@ -3,7 +3,7 @@
 # filter_N_seq.sh
 # Description: Split a fasta file into two files: 
 # - one with sequences containing only N/./- (empty)
-# - ne with all other sequences (noempty).
+# - one with all other sequences (noempty).
 # Version: 1.0
 # Date: 2025-09-29
 # Author: SP@NC (Copilot-assisted)
