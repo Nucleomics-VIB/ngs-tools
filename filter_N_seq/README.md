@@ -90,7 +90,7 @@ This ensures the code compiles with both gcc and g++.
 
 ## License
 
-See `klib/README.md` and `klib/LICENSE.txt` for third-party library licensing. Project-specific licensing will be added here.
+See klib licensing info in `lib/README.md` and `lib/LICENSE.txt` for third-party library licensing.
 
 ## Authors
 
