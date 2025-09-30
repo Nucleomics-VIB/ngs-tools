@@ -50,7 +50,7 @@ The C/C++ version uses [klib](https://github.com/attractivechaos/klib) for effic
 git clone https://github.com/attractivechaos/klib.git
 ```
 
-Alternatively, you can download and extract the latest release from the klib GitHub page.
+The strictly necessary libraries were copied from this git version and placed in the lib folder to build this project (2025-09-30).
 
 ## Building (C++ version)
 
