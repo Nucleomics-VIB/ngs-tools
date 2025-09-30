@@ -58,14 +58,16 @@ To compile the C++ version (example):
 
 ```bash
 # Compile filter_N_seq.cpp with klib (adjust filenames as needed)
-g++ -O2 -std=c++11 -I./klib -o filter_N_seq_cpp filter_N_seq.cpp -lz
+mkdir -p bin
+g++ -O2 -std=c++11 -I./lib -o bin/filter_N_seq_cpp filter_N_seq.cpp -lz
 ```
 
 **Note for Mac (Apple Silicon):**
 If you are compiling the C version (`filter_N_seq.c`), use `gcc` instead of `g++`:
 
 ```bash
-gcc -O2 -std=c11 -I./klib -o filter_N_seq_c filter_N_seq.c -lz
+mkdir -p bin
+gcc -O2 -std=c11 -I./lib -o bin/filter_N_seq_c filter_N_seq.c -lz
 ```
 
 If you use a Makefile, ensure to add `-I./klib` to your `CXXFLAGS` so the compiler can find the klib headers.
