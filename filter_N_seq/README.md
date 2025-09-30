@@ -86,7 +86,7 @@ With:
 unsigned char *sep = (unsigned char*)memchr(ks->buf + ks->begin, '\n', ks->end - ks->begin);
 unsigned char *sep = (unsigned char*)memchr(ks->buf + ks->begin, delimiter, ks->end - ks->begin);
 ```
-This ensures the code compiles with both gcc and g++.
+This ensures the code compiles with both gcc and g++. Note that the edits were applied to the version copied to the lib folder
 
 ## License
 
