@@ -58,10 +58,33 @@ To compile the C++ version (example):
 
 ```bash
 # Compile filter_N_seq.cpp with klib (adjust filenames as needed)
-g++ -O2 -std=c++11 -I./klib -o filter_N_seq filter_N_seq.cpp
+g++ -O2 -std=c++11 -I./klib -o filter_N_seq_cpp filter_N_seq.cpp -lz
+```
+
+**Note for Mac (Apple Silicon):**
+If you are compiling the C version (`filter_N_seq.c`), use `gcc` instead of `g++`:
+
+```bash
+gcc -O2 -std=c11 -I./klib -o filter_N_seq_c filter_N_seq.c -lz
 ```
 
 If you use a Makefile, ensure to add `-I./klib` to your `CXXFLAGS` so the compiler can find the klib headers.
+
+## Note for C++ compatibility with klib/kseq.h
+
+If you want to compile the C++ version, you must patch `klib/kseq.h` to add an explicit cast for C++ compatibility. Edit the following lines in `klib/kseq.h`:
+
+Replace:
+```c
+unsigned char *sep = memchr(ks->buf + ks->begin, '\n', ks->end - ks->begin);
+unsigned char *sep = memchr(ks->buf + ks->begin, delimiter, ks->end - ks->begin);
+```
+With:
+```c
+unsigned char *sep = (unsigned char*)memchr(ks->buf + ks->begin, '\n', ks->end - ks->begin);
+unsigned char *sep = (unsigned char*)memchr(ks->buf + ks->begin, delimiter, ks->end - ks->begin);
+```
+This ensures the code compiles with both gcc and g++.
 
 ## License
 

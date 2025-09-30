@@ -1,4 +1,6 @@
 
+#define _POSIX_C_SOURCE 200112L
+
 // filter_N_seq.c
 // Description: Split a fasta file into two files:
 // - one with sequences containing only N/./- (empty)
@@ -8,15 +10,15 @@
 // Requires: kseq.h (https://github.com/attractivechaos/klib)
 //           zlib (for file reading)
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+#include <unistd.h> // Required for getopt/optarg on Ubuntu
 #include <stdbool.h>
 #include <zlib.h>
 
-#define KSEQ_INIT(gzFile, gzread)
-#include "klib/kseq.h"
+#include "lib/kseq.h"
 KSEQ_INIT(gzFile, gzread)
 
 // Returns true if the sequence contains only N, ., or -
