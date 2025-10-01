@@ -18,6 +18,7 @@ The `filter_N_seq.sh` script reads a sequence file line by line, and for each se
 
 - `filter_N_seq.sh` — Bash script for filtering N sequences (main tool)
 - `filter_N_seq.c` — C implementation of the filter logic (performance improvement, in progress or as reference)
+- `filter_N_seq2.cpp` — C++ implementation with stdin/pipe support for use in pipelines
 - `klib/` — External C utility library (used for efficient data structures and algorithms in the C/C++ version)
 - `klib/test/` — Test files for klib components
 
@@ -37,9 +38,29 @@ After compiling, run:
 ./filter_N_seq -i input.fasta
 ```
 
-Both versions will produce:
+This will produce:
 - `input.fasta.empty.fasta` (sequences with only N/./-)
 - `input.fasta.noempty.fasta` (all other sequences)
+
+### Version 2 with pipe support (for use in pipelines):
+
+The `filter_N_seq2.cpp` version is designed for piping and can read from stdin:
+
+```bash
+# Pipe from standard input - outputs only non-empty sequences to stdout
+cat input.fasta | ./filter_N_seq2_cpp
+
+# Works with compressed files
+gzip -dc input.fasta.gz | ./filter_N_seq2_cpp
+
+# Can be used in a pipeline
+cat input.fasta | ./filter_N_seq2_cpp | some_other_tool
+
+# Still supports file mode to create both output files
+./filter_N_seq2_cpp -i input.fasta
+```
+
+**Note:** When using pipes (stdin), version 2 only outputs **non-empty sequences** to stdout. Empty sequences (containing only N/./-)  are **discarded** and not saved. Use the `-i` flag if you need both output files.
 
 ## Getting the klib Library
 
