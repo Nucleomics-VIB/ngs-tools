@@ -104,16 +104,24 @@ int main(int argc, char* argv[]) {
             if (is_empty_seq(seq->seq.s)) {
                 // Skip empty sequences or optionally mark them
                 // Uncomment next line to output empty sequences with a tag
-                // std::cout << ">" << seq->name.s << " [EMPTY]\n" << seq->seq.s << "\n";
+                // std::cout << ">" << seq->name.s;
+                // if (seq->comment.l) std::cout << " " << seq->comment.s;
+                // std::cout << " [EMPTY]\n" << seq->seq.s << "\n";
             } else {
-                std::cout << ">" << seq->name.s << "\n" << seq->seq.s << "\n";
+                std::cout << ">" << seq->name.s;
+                if (seq->comment.l) std::cout << " " << seq->comment.s;
+                std::cout << "\n" << seq->seq.s << "\n";
             }
         } else {
             // When reading from file, split into two files
             if (is_empty_seq(seq->seq.s)) {
-                *f_empty << ">" << seq->name.s << "\n" << seq->seq.s << "\n";
+                *f_empty << ">" << seq->name.s;
+                if (seq->comment.l) *f_empty << " " << seq->comment.s;
+                *f_empty << "\n" << seq->seq.s << "\n";
             } else {
-                *f_noempty << ">" << seq->name.s << "\n" << seq->seq.s << "\n";
+                *f_noempty << ">" << seq->name.s;
+                if (seq->comment.l) *f_noempty << " " << seq->comment.s;
+                *f_noempty << "\n" << seq->seq.s << "\n";
             }
         }
     }
