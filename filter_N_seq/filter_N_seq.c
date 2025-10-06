@@ -66,9 +66,13 @@ int main(int argc, char* argv[]) {
     kseq_t* seq = kseq_init(fp);
     while (kseq_read(seq) >= 0) {
         if (is_empty_seq(seq->seq.s)) {
-            fprintf(f_empty, ">%s\n%s\n", seq->name.s, seq->seq.s);
+            fprintf(f_empty, ">%s", seq->name.s);
+            if (seq->comment.l) fprintf(f_empty, " %s", seq->comment.s);
+            fprintf(f_empty, "\n%s\n", seq->seq.s);
         } else {
-            fprintf(f_noempty, ">%s\n%s\n", seq->name.s, seq->seq.s);
+            fprintf(f_noempty, ">%s", seq->name.s);
+            if (seq->comment.l) fprintf(f_noempty, " %s", seq->comment.s);
+            fprintf(f_noempty, "\n%s\n", seq->seq.s);
         }
     }
     kseq_destroy(seq);
