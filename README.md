@@ -411,3 +411,12 @@ The python script **[fastq2motif.py](fastq2motif.py)** identifies motifs in fast
 <h4>Please send comments and feedback to <a href="mailto:nucleomics.bioinformatics@vib.be">nucleomics.bioinformatics@vib.be</a></h4>
 
 <hr>
+
+<hr>
+
+![Licence: mixed content — none asserted](https://img.shields.io/badge/Licence-mixed%20content%20%E2%80%94%20none%20asserted-red.svg)
+
+**Mixed content — no licence asserted.** This repository contains material from more than
+one copyright holder. VIB Nucleomics Core claims no ownership of the third-party files and
+asserts no licence over the repository as a whole. See [`NOTICE.md`](NOTICE.md) for exactly
+which paths belong to whom, and contact us before reusing anything.
