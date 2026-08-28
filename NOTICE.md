@@ -10,3 +10,14 @@ Previously distributed under a Creative Commons Attribution-ShareAlike 3.0 Unpor
 licence, summarised in a `LICENSE.md` that no licence scanner could read, and which Creative Commons itself recommends against for source code. Relicensed
 on 2026-08-27 by the copyright holder. Copies obtained before that date remain available to
 their holders under CC BY-SA 3.0.
+
+## Third-party material
+
+`filter_N_seq/lib/kseq.h` and `filter_N_seq/lib/kstring.h` are third-party sources from
+**klib** (Attractive Chaos / Heng Li), distributed under the **MIT licence** — see
+[`filter_N_seq/lib/LICENSE.txt`](filter_N_seq/lib/LICENSE.txt) for the full text and the
+original copyright notices.
+
+VIB Nucleomics Core claims **no copyright** in these files. The MIT licence is compatible
+with the GNU GPL v3.0, so the combined work may be distributed under the terms in
+[`LICENSE`](LICENSE); the MIT notice above must be retained.
