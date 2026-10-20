@@ -4,8 +4,6 @@
 
 *All tools presented below have only been tested by me and may contain bugs, please let me know if you find some. Each tool relies on dependencies normally listed at the top of the code (cpan for perl, R packages, etc.)*
 
-Please refer to the accompanying **[wiki](https://github.com/Nucleomics-VIB/ngs-tools/wiki)** for examples and workflows.
-
 ## Fasta and Fastq Utilities
 
 *[[back-to-top](#top)]*  
